@@ -17,6 +17,7 @@ namespace MusicDataBase
         public Form1()
         {
             InitializeComponent();
+            bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true;
             bw.WorkerSupportsCancellation = true;
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
@@ -24,13 +25,14 @@ namespace MusicDataBase
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
         }
 
-        private BackgroundWorker bw = new BackgroundWorker();
-        //Зберігає шлях до обранної папки
+        //Забезпечує виконання роботи у окремому потоці
+        private BackgroundWorker bw;
+        //Зберігає шлях до обранного каталогу
         private String folderName = "";
 
-        private void openFolderButton_click(object sender, EventArgs e)
+        private void openFolderButton_click(object sender, EventArgs e) //Діалог вибору каталогу
         {
-            //Показує діалог вибору папки идля сканування
+            //Показує діалог вибору каталогу идля сканування
             DialogResult result = folderBrowserDialog1.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -39,30 +41,31 @@ namespace MusicDataBase
             }
         }
 
-        private void FilesInSubDirectories(string foldPath)
+        private void FilesInSubDirectories(string foldPath) //Скануємо каталог на наявність підкаталогів
         {
             DirectoryInfo parentDirectory = new DirectoryInfo(foldPath);
-            foreach (DirectoryInfo dir in parentDirectory.GetDirectories("*",SearchOption.AllDirectories))
+            DirectoryInfo[] subDirectories = parentDirectory.GetDirectories("*",SearchOption.AllDirectories);
+            foreach (DirectoryInfo dir in subDirectories)
             {
-                //Здесь мы вызываем метод удаления ненужных файлов, описанный выше.
-                //С той лишь разницей, что в качестве параметра мы теперь передаем не путь до каталога, а объект dir.
-                ParseAudio(dir);
+                if (bw.CancellationPending) return; //Якщо завдання було скасовано - вихід
+                ParseAudio(dir); //Скануємо всі файли у цьому каталозі
             }
         }
 
-		private void ParseAudio(DirectoryInfo dir)
+		private void ParseAudio(DirectoryInfo dir) //Сканує аудіо файли на наявність тегів
 		{
-			//Проверяем каждый mp3 файл в директории
-			foreach (FileInfo file in dir.GetFiles("*.*"))
+            FileInfo[] files = dir.GetFiles("*.*"); //Спсико усіх файлів у цьому каталозі
+            foreach (FileInfo file in files)
 			{
-                if(TagLib.SupportedMimeType.AllExtensions.Contains(file.Extension.ToLower().Replace(".", ""))) //if media file
+                if (bw.CancellationPending) return; //Якщо задача була скасована - вихід
+                if(TagLib.SupportedMimeType.AllExtensions.Contains(file.Extension.ToLower().Replace(".", ""))) //Якщо розширення файла відповідає медіа-файлу
                 {
                     try
                     {
                         TagLib.File tagFile = TagLib.File.Create(file.FullName);
-                        if (TagLib.MediaTypes.Audio == tagFile.Properties.MediaTypes)
+                        if (TagLib.MediaTypes.Audio == tagFile.Properties.MediaTypes) //Якщо цей медіа-файл є аудіо-файлом
                         {
-                            if (tagFile.Tag.IsEmpty == false)
+                            if (tagFile.Tag.IsEmpty == false) //Якщо у ньому є теги
                             {
                                 //richTextBox1.AppendText(tagFile.Tag.ToString() + Environment.NewLine);
                                 String artist = tagFile.Tag.FirstPerformer;
@@ -71,7 +74,8 @@ namespace MusicDataBase
                                 title = toUtf8(title);
                                 //artist = toUTF8(artist);
                                 //artist = Encoding.GetEncoding(1251).GetString(Encoding.GetEncoding(1252).GetBytes(artist));
-                                outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                                bw.ReportProgress(0,String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                                //outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                             }
 
                         }
@@ -86,10 +90,10 @@ namespace MusicDataBase
 			}
 		}
 
-        public string toUtf8(string unknown)
+        public string toUtf8(string unknown) //Конвертуємо усі теги у UTF-8
         {
             return new string(unknown.ToCharArray().
-                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Проверяем на кириллицу, и возвращаем utf-8
+                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Перевіряємо чи є текст кирилицею, та повертаємо utf-8
                 ToArray());
         }
 
@@ -108,18 +112,10 @@ namespace MusicDataBase
                 return;
             }
 
-            if (subdirectCheckBox.Checked) //subdirectories
-            {
-                ParseAudio(folder);
-                FilesInSubDirectories(folderName);
-            }
-            else
-            {
-                ParseAudio(folder);
-            }
-
             if (bw.IsBusy != true)
             {
+                parsingStatusLabel.Text = "Сканування...";
+                parsingProgressBar.Style = ProgressBarStyle.Marquee;
                 bw.RunWorkerAsync();
             }
         }
@@ -128,41 +124,59 @@ namespace MusicDataBase
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            for (int i = 1; (i <= 10); i++)
-            {
+            //for (int i = 1; (i <= 10); i++)
+            //{
                 if ((worker.CancellationPending == true))
                 {
                     e.Cancel = true;
-                    break;
+                    //break;
                 }
                 else
                 {
                     // Perform a time consuming operation and report progress.
-                    System.Threading.Thread.Sleep(500);
-                    worker.ReportProgress((i * 10));
+                    //System.Threading.Thread.Sleep(500);
+                    DirectoryInfo folder = new DirectoryInfo(folderName);
+                    if (subdirectCheckBox.Checked) //subdirectories
+                    {
+                        ParseAudio(folder);
+                        FilesInSubDirectories(folderName);
+                    }
+                    else
+                    {
+                        ParseAudio(folder);
+                    }
+                    //worker.ReportProgress((10));
+                    if (worker.CancellationPending == true) //Перевіряємо, чи завдання було відмінено в ході виконання
+                    {
+                        e.Cancel = true;
+                    }
                 }
-            }
+            //}
         }
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if ((e.Cancelled == true))
             {
-                this.parsingStatusLabel.Text = "Canceled!";
+                this.parsingStatusLabel.Text = "Відмінено!";
+                this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
             }
 
             else if (!(e.Error == null))
             {
-                this.parsingStatusLabel.Text = ("Error: " + e.Error.Message);
+                this.parsingStatusLabel.Text = ("Помилка: " + e.Error.Message);
+                this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
             }
 
             else
             {
-                this.parsingStatusLabel.Text = "Done!";
+                this.parsingStatusLabel.Text = "Завершено!";
+                this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
             }
         }
         private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.parsingStatusLabel.Text = (e.ProgressPercentage.ToString() + "%");
+            //this.parsingStatusLabel.Text = (e.ProgressPercentage.ToString() + "%");
+            this.outPutText.AppendText(e.UserState.ToString());
         }
 
         private void stopParsingButton_Click(object sender, EventArgs e)

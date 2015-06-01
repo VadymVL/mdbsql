@@ -45,8 +45,10 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.outPutText = new System.Windows.Forms.TextBox();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.chooseDirectoryGroup.SuspendLayout();
             this.parseStatusPanel.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFolderButton
@@ -119,7 +121,6 @@
             this.parsingProgressBar.Location = new System.Drawing.Point(4, 28);
             this.parsingProgressBar.Name = "parsingProgressBar";
             this.parsingProgressBar.Size = new System.Drawing.Size(120, 23);
-            this.parsingProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.parsingProgressBar.TabIndex = 10;
             // 
             // parsingStatusLabel
@@ -161,9 +162,11 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 358);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripProgressLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 355);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(557, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(557, 25);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -181,6 +184,12 @@
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
+            // toolStripProgressLabel
+            // 
+            this.toolStripProgressLabel.Name = "toolStripProgressLabel";
+            this.toolStripProgressLabel.Size = new System.Drawing.Size(151, 20);
+            this.toolStripProgressLabel.Text = "toolStripStatusLabel1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -197,6 +206,8 @@
             this.chooseDirectoryGroup.PerformLayout();
             this.parseStatusPanel.ResumeLayout(false);
             this.parseStatusPanel.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -220,6 +231,7 @@
         private System.Windows.Forms.ProgressBar parsingProgressBar;
         private System.Windows.Forms.Label parsingStatusLabel;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripProgressLabel;
     }
 }
 
