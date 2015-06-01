@@ -112,6 +112,7 @@
             this.stopParsingButton.TabIndex = 9;
             this.stopParsingButton.Text = "Стоп";
             this.stopParsingButton.UseVisualStyleBackColor = true;
+            this.stopParsingButton.Click += new System.EventHandler(this.stopParsingButton_Click);
             // 
             // parsingProgressBar
             // 
