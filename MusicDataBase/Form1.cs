@@ -17,6 +17,7 @@ namespace MusicDataBase
         public Form1()
         {
             InitializeComponent();
+            notifyIcon1.Visible = false;
             bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true;
             bw.WorkerSupportsCancellation = true;
@@ -29,6 +30,9 @@ namespace MusicDataBase
         private BackgroundWorker bw;
         //Зберігає шлях до обранного каталогу
         private String folderName = "";
+        private int totalFolders = 0;
+        private int totalFiles = 0;
+        private int songCount = 0;
 
         private void openFolderButton_click(object sender, EventArgs e) //Діалог вибору каталогу
         {
@@ -54,9 +58,13 @@ namespace MusicDataBase
 
 		private void ParseAudio(DirectoryInfo dir) //Сканує аудіо файли на наявність тегів
 		{
-            FileInfo[] files = dir.GetFiles("*.*"); //Спсико усіх файлів у цьому каталозі
+            int count = 0;
+            FileInfo[] files = dir.GetFiles("*.*"); //Список усіх файлів у цьому каталозі
             foreach (FileInfo file in files)
 			{
+                count++;
+                totalFiles++;
+                String songName = "";
                 if (bw.CancellationPending) return; //Якщо задача була скасована - вихід
                 if(TagLib.SupportedMimeType.AllExtensions.Contains(file.Extension.ToLower().Replace(".", ""))) //Якщо розширення файла відповідає медіа-файлу
                 {
@@ -74,8 +82,9 @@ namespace MusicDataBase
                                 title = toUtf8(title);
                                 //artist = toUTF8(artist);
                                 //artist = Encoding.GetEncoding(1251).GetString(Encoding.GetEncoding(1252).GetBytes(artist));
-                                bw.ReportProgress(0,String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                                songName = (String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                                 //outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                                songCount++;
                             }
 
                         }
@@ -86,8 +95,15 @@ namespace MusicDataBase
                     }
                     
                 }
+                String[] result = new String[4];
+                result[0] = songName;
+                result[1] = count.ToString();
+                result[2] = files.Length.ToString();
+                result[3] = dir.Name;
+                bw.ReportProgress(0, result);
 
 			}
+            totalFolders++;
 		}
 
         public string toUtf8(string unknown) //Конвертуємо усі теги у UTF-8
@@ -114,8 +130,12 @@ namespace MusicDataBase
 
             if (bw.IsBusy != true)
             {
-                parsingStatusLabel.Text = "Сканування...";
+                parsingStatusLabel.Text = "Статус: Сканування...";
                 parsingProgressBar.Style = ProgressBarStyle.Marquee;
+                totalFolders = 0;
+                totalFiles = 0;
+                songCount = 0;
+                outPutText.Text = "";
                 bw.RunWorkerAsync();
             }
         }
@@ -157,26 +177,38 @@ namespace MusicDataBase
         {
             if ((e.Cancelled == true))
             {
-                this.parsingStatusLabel.Text = "Відмінено!";
+                this.parsingStatusLabel.Text = "Статус: Відмінено!";
                 this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
             }
 
             else if (!(e.Error == null))
             {
-                this.parsingStatusLabel.Text = ("Помилка: " + e.Error.Message);
+                this.parsingStatusLabel.Text = ("Статус: Помилка: " + e.Error.Message);
                 this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
+                this.notifyIcon1.Visible = true;
+                this.notifyIcon1.ShowBalloonTip(15, "Помилка!", e.Error.Message, ToolTipIcon.Error);
             }
 
             else
             {
-                this.parsingStatusLabel.Text = "Завершено!";
+                this.parsingStatusLabel.Text = "Статус: Завершено!";
+                this.toolStripProgressLabel.Text = "Завершено!";
                 this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
+                this.notifyIcon1.Visible = true;
+                this.notifyIcon1.ShowBalloonTip(15,"Завершено!", "Знайдено: " + songCount + Environment.NewLine + "Проскановано: файлів " + totalFiles + ", каталогів " + totalFolders, ToolTipIcon.Info);
             }
         }
         private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             //this.parsingStatusLabel.Text = (e.ProgressPercentage.ToString() + "%");
-            this.outPutText.AppendText(e.UserState.ToString());
+            //this.outPutText.AppendText(e.UserState.ToString());
+            if (e.UserState != null)
+            {
+                String[] result = (String[])e.UserState;
+                if(String.IsNullOrEmpty(result[0]) == false) this.outPutText.AppendText(result[0]);
+                this.toolStripProgressLabel.Text = result[3] + ": " + result[1] + "/" + result[2];
+                this.toolStripProgressCountLabel.Text = "Знайдено: " + songCount + " Проскановано: файлів " + totalFiles + ", каталогів " + totalFolders;
+            }
         }
 
         private void stopParsingButton_Click(object sender, EventArgs e)
@@ -185,6 +217,11 @@ namespace MusicDataBase
             {
                 bw.CancelAsync();
             }
+        }
+
+        private void notifyIcon1_BalloonTipClosed(object sender, EventArgs e)
+        {
+            notifyIcon1.Visible = false;
         }
 
     }
