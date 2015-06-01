@@ -95,13 +95,16 @@ namespace MusicDataBase
                     }
                     
                 }
-                String[] result = new String[4];
-                result[0] = songName;
-                result[1] = count.ToString();
-                result[2] = files.Length.ToString();
-                result[3] = dir.Name;
-                bw.ReportProgress(0, result);
 
+                if (showProcessCheckBox.Checked == true)
+                {
+                    String[] result = new String[4];
+                    result[0] = songName;
+                    result[1] = count.ToString();
+                    result[2] = files.Length.ToString();
+                    result[3] = dir.Name;
+                    bw.ReportProgress(0, result);
+                }
 			}
             totalFolders++;
 		}
@@ -202,7 +205,7 @@ namespace MusicDataBase
         {
             //this.parsingStatusLabel.Text = (e.ProgressPercentage.ToString() + "%");
             //this.outPutText.AppendText(e.UserState.ToString());
-            if (e.UserState != null)
+            if (e.UserState != null && bw.CancellationPending == false && showProcessCheckBox.Checked == true)
             {
                 String[] result = (String[])e.UserState;
                 if(String.IsNullOrEmpty(result[0]) == false) this.outPutText.AppendText(result[0]);
@@ -222,6 +225,14 @@ namespace MusicDataBase
         private void notifyIcon1_BalloonTipClosed(object sender, EventArgs e)
         {
             notifyIcon1.Visible = false;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (bw.WorkerSupportsCancellation == true)
+            {
+                bw.CancelAsync();
+            }
         }
 
     }
