@@ -35,7 +35,7 @@ namespace MusicDataBase
         private void FilesInSubDirectories(string foldPath)
         {
             DirectoryInfo parentDirectory = new DirectoryInfo(foldPath);
-            foreach (DirectoryInfo dir in parentDirectory.GetDirectories())
+            foreach (DirectoryInfo dir in parentDirectory.GetDirectories("*",SearchOption.AllDirectories))
             {
                 //Здесь мы вызываем метод удаления ненужных файлов, описанный выше.
                 //С той лишь разницей, что в качестве параметра мы теперь передаем не путь до каталога, а объект dir.
@@ -58,7 +58,13 @@ namespace MusicDataBase
                             if (tagFile.Tag.IsEmpty == false)
                             {
                                 //richTextBox1.AppendText(tagFile.Tag.ToString() + Environment.NewLine);
-                                richTextBox1.AppendText(tagFile.Tag.FirstPerformer + " - " + tagFile.Tag.Title + Environment.NewLine);
+                                String artist = tagFile.Tag.FirstPerformer;
+                                artist = toUtf8(artist);
+                                String title = tagFile.Tag.Title;
+                                title = toUtf8(title);
+                                //artist = toUTF8(artist);
+                                //artist = Encoding.GetEncoding(1251).GetString(Encoding.GetEncoding(1252).GetBytes(artist));
+                                textBox2.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                             }
 
                         }
@@ -73,6 +79,23 @@ namespace MusicDataBase
 			}
 		}
 
+        public static string toUtf8(string unknown)
+        {
+            return new string(unknown.ToCharArray().
+                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x).
+                ToArray());
+        }
+
+        private String toUTF8(String arg)
+        {
+            Encoding wind1252 = Encoding.GetEncoding(1252);
+            Encoding utf8 = Encoding.UTF8;
+            byte[] wind1252Bytes = Encoding.Default.GetBytes(arg);
+            byte[] utf8Bytes = Encoding.Convert(wind1252, utf8, wind1252Bytes);
+            String result = Encoding.UTF8.GetString(utf8Bytes);
+            return result;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             DirectoryInfo folder = new DirectoryInfo(folderName);
@@ -85,6 +108,7 @@ namespace MusicDataBase
 
             if (checkBox1.Checked) //subdirectories
             {
+                ParseAudio(folder);
                 FilesInSubDirectories(folderName);
             }
             else
