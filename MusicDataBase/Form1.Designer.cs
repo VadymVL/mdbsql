@@ -28,79 +28,123 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.components = new System.ComponentModel.Container();
+            this.openFolderButton = new System.Windows.Forms.Button();
+            this.subdirectCheckBox = new System.Windows.Forms.CheckBox();
+            this.chooseDirectoryGroup = new System.Windows.Forms.GroupBox();
+            this.parseButton = new System.Windows.Forms.Button();
+            this.parseStatusPanel = new System.Windows.Forms.Panel();
+            this.stopParsingButton = new System.Windows.Forms.Button();
+            this.parsingProgressBar = new System.Windows.Forms.ProgressBar();
+            this.parsingStatusLabel = new System.Windows.Forms.Label();
+            this.openFolderPathBox = new System.Windows.Forms.TextBox();
+            this.selectFolderLabel = new System.Windows.Forms.Label();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.groupBox1.SuspendLayout();
+            this.outPutText = new System.Windows.Forms.TextBox();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.chooseDirectoryGroup.SuspendLayout();
+            this.parseStatusPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // button1
+            // openFolderButton
             // 
-            this.button1.Location = new System.Drawing.Point(131, 45);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "open";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.openFolderButton.Location = new System.Drawing.Point(131, 45);
+            this.openFolderButton.Name = "openFolderButton";
+            this.openFolderButton.Size = new System.Drawing.Size(75, 23);
+            this.openFolderButton.TabIndex = 0;
+            this.openFolderButton.Text = "Обрати";
+            this.openFolderButton.UseVisualStyleBackColor = true;
+            this.openFolderButton.Click += new System.EventHandler(this.openFolderButton_click);
             // 
-            // checkBox1
+            // subdirectCheckBox
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(6, 73);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(121, 21);
-            this.checkBox1.TabIndex = 1;
-            this.checkBox1.Text = "Subdirectories";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.subdirectCheckBox.AutoSize = true;
+            this.subdirectCheckBox.Location = new System.Drawing.Point(6, 73);
+            this.subdirectCheckBox.Name = "subdirectCheckBox";
+            this.subdirectCheckBox.Size = new System.Drawing.Size(185, 21);
+            this.subdirectCheckBox.TabIndex = 1;
+            this.subdirectCheckBox.Text = "Включати підкаталоги?";
+            this.subdirectCheckBox.UseVisualStyleBackColor = true;
             // 
-            // groupBox1
+            // chooseDirectoryGroup
             // 
-            this.groupBox1.Controls.Add(this.button2);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Controls.Add(this.checkBox1);
-            this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(214, 129);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Choose directory";
+            this.chooseDirectoryGroup.Controls.Add(this.parseButton);
+            this.chooseDirectoryGroup.Controls.Add(this.parseStatusPanel);
+            this.chooseDirectoryGroup.Controls.Add(this.openFolderPathBox);
+            this.chooseDirectoryGroup.Controls.Add(this.subdirectCheckBox);
+            this.chooseDirectoryGroup.Controls.Add(this.openFolderButton);
+            this.chooseDirectoryGroup.Controls.Add(this.selectFolderLabel);
+            this.chooseDirectoryGroup.Location = new System.Drawing.Point(12, 12);
+            this.chooseDirectoryGroup.Name = "chooseDirectoryGroup";
+            this.chooseDirectoryGroup.Size = new System.Drawing.Size(214, 198);
+            this.chooseDirectoryGroup.TabIndex = 2;
+            this.chooseDirectoryGroup.TabStop = false;
+            this.chooseDirectoryGroup.Text = "Сканування";
             // 
-            // button2
+            // parseButton
             // 
-            this.button2.Location = new System.Drawing.Point(70, 100);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 8;
-            this.button2.Text = "Parse";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.parseButton.Location = new System.Drawing.Point(64, 100);
+            this.parseButton.Name = "parseButton";
+            this.parseButton.Size = new System.Drawing.Size(86, 23);
+            this.parseButton.TabIndex = 8;
+            this.parseButton.Text = "Сканувати";
+            this.parseButton.UseVisualStyleBackColor = true;
+            this.parseButton.Click += new System.EventHandler(this.parseButton_click);
             // 
-            // textBox1
+            // parseStatusPanel
             // 
-            this.textBox1.Location = new System.Drawing.Point(6, 45);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(119, 22);
-            this.textBox1.TabIndex = 7;
+            this.parseStatusPanel.Controls.Add(this.stopParsingButton);
+            this.parseStatusPanel.Controls.Add(this.parsingProgressBar);
+            this.parseStatusPanel.Controls.Add(this.parsingStatusLabel);
+            this.parseStatusPanel.Location = new System.Drawing.Point(6, 129);
+            this.parseStatusPanel.Name = "parseStatusPanel";
+            this.parseStatusPanel.Size = new System.Drawing.Size(208, 58);
+            this.parseStatusPanel.TabIndex = 8;
             // 
-            // label1
+            // stopParsingButton
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 17);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Select folder";
+            this.stopParsingButton.Location = new System.Drawing.Point(130, 28);
+            this.stopParsingButton.Name = "stopParsingButton";
+            this.stopParsingButton.Size = new System.Drawing.Size(75, 23);
+            this.stopParsingButton.TabIndex = 9;
+            this.stopParsingButton.Text = "Стоп";
+            this.stopParsingButton.UseVisualStyleBackColor = true;
+            // 
+            // parsingProgressBar
+            // 
+            this.parsingProgressBar.Location = new System.Drawing.Point(4, 28);
+            this.parsingProgressBar.Name = "parsingProgressBar";
+            this.parsingProgressBar.Size = new System.Drawing.Size(120, 23);
+            this.parsingProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.parsingProgressBar.TabIndex = 10;
+            // 
+            // parsingStatusLabel
+            // 
+            this.parsingStatusLabel.AutoSize = true;
+            this.parsingStatusLabel.Location = new System.Drawing.Point(4, 5);
+            this.parsingStatusLabel.Name = "parsingStatusLabel";
+            this.parsingStatusLabel.Size = new System.Drawing.Size(46, 17);
+            this.parsingStatusLabel.TabIndex = 11;
+            this.parsingStatusLabel.Text = "label2";
+            // 
+            // openFolderPathBox
+            // 
+            this.openFolderPathBox.Location = new System.Drawing.Point(6, 45);
+            this.openFolderPathBox.Name = "openFolderPathBox";
+            this.openFolderPathBox.Size = new System.Drawing.Size(119, 22);
+            this.openFolderPathBox.TabIndex = 7;
+            // 
+            // selectFolderLabel
+            // 
+            this.selectFolderLabel.AutoSize = true;
+            this.selectFolderLabel.Location = new System.Drawing.Point(3, 25);
+            this.selectFolderLabel.Name = "selectFolderLabel";
+            this.selectFolderLabel.Size = new System.Drawing.Size(119, 17);
+            this.selectFolderLabel.TabIndex = 3;
+            this.selectFolderLabel.Text = "Оберіть каталог:";
             // 
             // menuStrip1
             // 
@@ -122,28 +166,36 @@
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // textBox2
+            // outPutText
             // 
-            this.textBox2.Location = new System.Drawing.Point(232, 12);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(313, 343);
-            this.textBox2.TabIndex = 7;
+            this.outPutText.Location = new System.Drawing.Point(232, 12);
+            this.outPutText.Multiline = true;
+            this.outPutText.Name = "outPutText";
+            this.outPutText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.outPutText.Size = new System.Drawing.Size(313, 343);
+            this.outPutText.TabIndex = 7;
+            // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(557, 380);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.outPutText);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.chooseDirectoryGroup);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.chooseDirectoryGroup.ResumeLayout(false);
+            this.chooseDirectoryGroup.PerformLayout();
+            this.parseStatusPanel.ResumeLayout(false);
+            this.parseStatusPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -151,17 +203,22 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button openFolderButton;
+        private System.Windows.Forms.CheckBox subdirectCheckBox;
+        private System.Windows.Forms.GroupBox chooseDirectoryGroup;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label selectFolderLabel;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox openFolderPathBox;
+        private System.Windows.Forms.Button parseButton;
+        private System.Windows.Forms.TextBox outPutText;
+        private System.Windows.Forms.Panel parseStatusPanel;
+        private System.Windows.Forms.Button stopParsingButton;
+        private System.Windows.Forms.ProgressBar parsingProgressBar;
+        private System.Windows.Forms.Label parsingStatusLabel;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }
 

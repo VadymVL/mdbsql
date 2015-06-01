@@ -19,16 +19,17 @@ namespace MusicDataBase
             InitializeComponent();
         }
 
+        //Зберігає шлях до обранної папки
         private String folderName = "";
 
-        private void button1_Click(object sender, EventArgs e)
+        private void openFolderButton_click(object sender, EventArgs e)
         {
-            // Show the FolderBrowserDialog.
+            //Показує діалог вибору папки идля сканування
             DialogResult result = folderBrowserDialog1.ShowDialog();
             if (result == DialogResult.OK)
             {
                 folderName = folderBrowserDialog1.SelectedPath;
-                textBox1.Text = folderName;
+                openFolderPathBox.Text = folderName; //Відображаємо цей шлях для користувача
             }
         }
 
@@ -64,7 +65,7 @@ namespace MusicDataBase
                                 title = toUtf8(title);
                                 //artist = toUTF8(artist);
                                 //artist = Encoding.GetEncoding(1251).GetString(Encoding.GetEncoding(1252).GetBytes(artist));
-                                textBox2.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                                outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                             }
 
                         }
@@ -79,34 +80,30 @@ namespace MusicDataBase
 			}
 		}
 
-        public static string toUtf8(string unknown)
+        public string toUtf8(string unknown)
         {
             return new string(unknown.ToCharArray().
-                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x).
+                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Проверяем на кириллицу, и возвращаем utf-8
                 ToArray());
         }
 
-        private String toUTF8(String arg)
+        private void parseButton_click(object sender, EventArgs e)
         {
-            Encoding wind1252 = Encoding.GetEncoding(1252);
-            Encoding utf8 = Encoding.UTF8;
-            byte[] wind1252Bytes = Encoding.Default.GetBytes(arg);
-            byte[] utf8Bytes = Encoding.Convert(wind1252, utf8, wind1252Bytes);
-            String result = Encoding.UTF8.GetString(utf8Bytes);
-            return result;
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
+            if (String.IsNullOrEmpty(openFolderPathBox.Text) == false && String.IsNullOrWhiteSpace(openFolderPathBox.Text) == false) folderName = openFolderPathBox.Text;
+            else
+            {
+                MessageBox.Show("Оберіть каталог для сканування!", "Увага!");
+                return;
+            }
             DirectoryInfo folder = new DirectoryInfo(folderName);
             if(folder.Exists == false)
             {
-                MessageBox.Show("Alert!","Directory doesn't exist!");
+                MessageBox.Show("Каталог не існує, або шлях вказаний невірно!", "Увага!");
                 return;
             }
 
 
-            if (checkBox1.Checked) //subdirectories
+            if (subdirectCheckBox.Checked) //subdirectories
             {
                 ParseAudio(folder);
                 FilesInSubDirectories(folderName);
