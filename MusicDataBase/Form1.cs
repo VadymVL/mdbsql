@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Data.Common;
+using System.Data.SQLite;
 using TagLib;
 
 namespace MusicDataBase
@@ -58,6 +60,12 @@ namespace MusicDataBase
 
 		private void ParseAudio(DirectoryInfo dir) //Сканує аудіо файли на наявність тегів
 		{
+            const string databaseName = @"cyber.db";
+            SQLiteConnection connection =
+                new SQLiteConnection(string.Format("Data Source={0};", databaseName));
+            connection.Open();
+            SQLiteTransaction transaction = connection.BeginTransaction();
+
             int count = 0;
             FileInfo[] files = dir.GetFiles("*.*"); //Список усіх файлів у цьому каталозі
             foreach (FileInfo file in files)
@@ -85,6 +93,8 @@ namespace MusicDataBase
                                 songName = (String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                                 //outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                                 songCount++;
+                                dbInsert("artist", "name", "'" + artist + "'", connection);
+                                dbInsert("song", "name", "'" + title + "'", connection);
                             }
 
                         }
@@ -107,6 +117,8 @@ namespace MusicDataBase
                 }
 			}
             totalFolders++;
+            transaction.Commit();
+            connection.Close();
 		}
 
         public string toUtf8(string unknown) //Конвертуємо усі теги у UTF-8
@@ -234,6 +246,110 @@ namespace MusicDataBase
                 bw.CancelAsync();
             }
         }
+
+        static int counterId = 1;
+        private static void dbConnect()
+        {
+            
+            const string databaseName = @"cyber.db";
+            SQLiteConnection connection =
+                new SQLiteConnection(string.Format("Data Source={0};", databaseName));
+            connection.Open();
+            SQLiteCommand command = new SQLiteCommand("INSERT INTO 'artist' ('id', 'name') VALUES (1, 'Вася');", connection);
+            //command.ExecuteNonQuery();
+            SQLiteCommand insert = new SQLiteCommand("IF EXISTS (SELECT * FROM 'artist' WHERE 'name'='Вася') " +
+                                                      "UPDATE 'artist' SET (...) WHERE Column1='SomeValue' " +
+                                                      "ELSE INSERT INTO 'artist' VALUES (...)", connection);
+
+            SQLiteCommand insert2 = new SQLiteCommand("INSERT INTO memos(id,text) " + 
+                                                      "SELECT 5, 'text to insert' " +
+                                                      "WHERE NOT EXISTS (SELECT 1 FROM memos WHERE id = 5 AND text = 'text to insert');", connection);
+
+            SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO artist(id, name) " +
+                                                      "SELECT " + counterId + ", 'Вася' " +
+                                                      "WHERE NOT EXISTS (SELECT 1 FROM artist WHERE id = " + counterId + " AND name = 'Вася');", connection);
+            insert22.ExecuteNonQuery();
+
+            //SQLiteCommand insert3 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columns + " ) " + 
+             //                                          "SELECT " + values + " " +
+             //                                          "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE id = 5 AND text = 'text to insert');", connection);
+            connection.Close();
+            counterId++;
+        }
+
+        static SQLiteConnection m_dbConnection;
+        public static void Run()
+        {
+            // http://blog.tigrangasparian.com/2012/02/09/getting-started-with-sqlite-in-c-part-one/
+            // 
+            // ### Create the database
+            // SQLiteConnection.CreateFile("MyDatabase.sqlite");
+ 
+            // ### Connect to the database
+            m_dbConnection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
+            m_dbConnection.Open();
+ 
+            // ### Create a table
+            // string sql = "CREATE TABLE highscores (name VARCHAR(20), score INT)";
+            // SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            // command.ExecuteNonQuery();
+ 
+            // ### Add some data to the table
+            // string sql = "insert into highscores (name, score) values ('Me', 3000)";
+            // SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            // command.ExecuteNonQuery();
+            // sql = "insert into highscores (name, score) values ('Myself', 6000)";
+            // command = new SQLiteCommand(sql, m_dbConnection);
+            // command.ExecuteNonQuery();
+            // sql = "insert into highscores (name, score) values ('And I', 9001)";
+            // command = new SQLiteCommand(sql, m_dbConnection);
+            // command.ExecuteNonQuery();
+ 
+            // ### select the data
+            string sql = "select * from highscores order by score desc";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+                Console.WriteLine("Name: " + reader["name"] + "\tScore: " + reader["score"]);
+ 
+            Console.ReadKey();
+        }
+
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            String id = "'"+ numericUpDown1.Text +"'";
+            String name = "'" + textBox1.Text + "'";
+            String[] columnsArray = new String[] {"id", "name"};
+            String[] valuesArray = new String[] { id, name };
+            //dbInsert("artist", columnsArray, valuesArray);
+            //dbConnect();
+        }
+
+        private void dbInsert(String tableName, String columnsString, String valuesString, SQLiteConnection connection/*String[] columnsArray, String[] valuesArray*/)
+        {
+            //String columnsString = "name";//String.Join(", ", columnsArray);
+           // String valuesString = "'" + textBox1.Text + "'";//String.Join(", ", valuesArray);
+            
+            SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columnsString + " ) " +
+                                                       "SELECT " + valuesString + " " +
+                                                       "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + columnsString + " = " + valuesString/* + columnsArray[0] + " = " + valuesArray[0] + " AND " + columnsArray[1] + " = " + valuesArray[1]*/ + " );", connection);
+            insert22.ExecuteNonQuery();
+            //connection.Close();
+          //  List<Object> items;
+         //   using (var db = new SQLiteConnection(@"cyber.db"))
+          //  {
+         //       db.RunInTransaction(() =>
+         ////       {
+         //           foreach (var item in items)
+         //           {
+         //               db.Insert(item);
+        //            }
+        //        });
+        //    }
+        }
+
 
     }
 

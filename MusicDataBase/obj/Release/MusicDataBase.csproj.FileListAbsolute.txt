@@ -9,3 +9,6 @@ C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase
 C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.csproj.GenerateResource.Cache
 C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.exe
 C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.pdb
+C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Release\System.Data.SQLite.dll
+C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Release\System.Data.SQLite.xml
+C:\Users\Vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.csprojResolveAssemblyReference.cache

@@ -33,6 +33,7 @@
             this.openFolderButton = new System.Windows.Forms.Button();
             this.subdirectCheckBox = new System.Windows.Forms.CheckBox();
             this.chooseDirectoryGroup = new System.Windows.Forms.GroupBox();
+            this.showProcessCheckBox = new System.Windows.Forms.CheckBox();
             this.parseButton = new System.Windows.Forms.Button();
             this.parseStatusPanel = new System.Windows.Forms.Panel();
             this.stopParsingButton = new System.Windows.Forms.Button();
@@ -47,11 +48,16 @@
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressCountLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.showProcessCheckBox = new System.Windows.Forms.CheckBox();
             this.outPutText = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.chooseDirectoryGroup.SuspendLayout();
             this.parseStatusPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // openFolderButton
@@ -89,6 +95,16 @@
             this.chooseDirectoryGroup.TabIndex = 2;
             this.chooseDirectoryGroup.TabStop = false;
             this.chooseDirectoryGroup.Text = "Сканування";
+            // 
+            // showProcessCheckBox
+            // 
+            this.showProcessCheckBox.AutoSize = true;
+            this.showProcessCheckBox.Location = new System.Drawing.Point(6, 100);
+            this.showProcessCheckBox.Name = "showProcessCheckBox";
+            this.showProcessCheckBox.Size = new System.Drawing.Size(158, 21);
+            this.showProcessCheckBox.TabIndex = 12;
+            this.showProcessCheckBox.Text = "Показувати процес";
+            this.showProcessCheckBox.UseVisualStyleBackColor = true;
             // 
             // parseButton
             // 
@@ -196,16 +212,6 @@
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.BalloonTipClosed += new System.EventHandler(this.notifyIcon1_BalloonTipClosed);
             // 
-            // showProcessCheckBox
-            // 
-            this.showProcessCheckBox.AutoSize = true;
-            this.showProcessCheckBox.Location = new System.Drawing.Point(6, 100);
-            this.showProcessCheckBox.Name = "showProcessCheckBox";
-            this.showProcessCheckBox.Size = new System.Drawing.Size(158, 21);
-            this.showProcessCheckBox.TabIndex = 12;
-            this.showProcessCheckBox.Text = "Показувати процес";
-            this.showProcessCheckBox.UseVisualStyleBackColor = true;
-            // 
             // outPutText
             // 
             this.outPutText.Location = new System.Drawing.Point(232, 12);
@@ -215,11 +221,63 @@
             this.outPutText.Size = new System.Drawing.Size(313, 343);
             this.outPutText.TabIndex = 7;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(75, 319);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "insert";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(105, 291);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 22);
+            this.textBox1.TabIndex = 9;
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(43, 290);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(56, 22);
+            this.numericUpDown1.TabIndex = 10;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(43, 267);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(19, 17);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "id";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(105, 268);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(43, 17);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "name";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(557, 380);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.outPutText);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.chooseDirectoryGroup);
@@ -234,6 +292,7 @@
             this.parseStatusPanel.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -260,6 +319,11 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripProgressCountLabel;
         private System.Windows.Forms.CheckBox showProcessCheckBox;
         private System.Windows.Forms.TextBox outPutText;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
