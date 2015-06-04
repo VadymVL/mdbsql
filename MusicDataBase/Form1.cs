@@ -20,6 +20,7 @@ namespace MusicDataBase
         {
             InitializeComponent();
             notifyIcon1.Visible = false;
+            connection = new SQLiteConnection();
             bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true;
             bw.WorkerSupportsCancellation = true;
@@ -35,6 +36,10 @@ namespace MusicDataBase
         private int totalFolders = 0;
         private int totalFiles = 0;
         private int songCount = 0;
+        const string databaseName = @"cyber.db";
+        SQLiteConnection connection;
+        DateTime a = new DateTime();
+        DateTime b = new DateTime();
 
         private void openFolderButton_click(object sender, EventArgs e) //Діалог вибору каталогу
         {
@@ -60,10 +65,6 @@ namespace MusicDataBase
 
 		private void ParseAudio(DirectoryInfo dir) //Сканує аудіо файли на наявність тегів
 		{
-            const string databaseName = @"cyber.db";
-            SQLiteConnection connection =
-                new SQLiteConnection(string.Format("Data Source={0};", databaseName));
-            connection.Open();
             SQLiteTransaction transaction = connection.BeginTransaction();
 
             int count = 0;
@@ -93,15 +94,23 @@ namespace MusicDataBase
                                 songName = (String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                                 //outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                                 songCount++;
-                                dbInsert("artist", "name", "'" + artist + "'", connection);
-                                dbInsert("song", "name", "'" + title + "'", connection);
+                          //      dbInsert("artist", "artist_name", "'" + artist + "'", connection);
+                                //TODO// - update dbInsert to handle multiple parameters, like several row inserts
+                           //     dbInsert("track", "track_name, artist_id", "'" + title + "', '" + connection.LastInsertRowId + "'", connection);
+                                String[] artist_columns = {"artist_name"};
+                                String[] artist_values = { artist };
+                                dbInsert("artist", artist_columns, artist_values, connection);
+                                String artistId = dbGetID("artist", "artist_name", artist, connection);
+                                String[] track_columns = {"track_name", "artist_id"};
+                                String[] track_values = { title, artistId };
+                                dbInsert("track", track_columns, track_values, connection);
                             }
 
                         }
                     }
                     catch (Exception e)
                     {
-
+                        System.Console.WriteLine(e.Message);
                     }
                     
                 }
@@ -118,7 +127,6 @@ namespace MusicDataBase
 			}
             totalFolders++;
             transaction.Commit();
-            connection.Close();
 		}
 
         public string toUtf8(string unknown) //Конвертуємо усі теги у UTF-8
@@ -170,7 +178,10 @@ namespace MusicDataBase
                 {
                     // Perform a time consuming operation and report progress.
                     //System.Threading.Thread.Sleep(500);
+                    a = DateTime.Now;
                     DirectoryInfo folder = new DirectoryInfo(folderName);
+                    initDbConnection();
+                    connection.Open();
                     if (subdirectCheckBox.Checked) //subdirectories
                     {
                         ParseAudio(folder);
@@ -180,6 +191,8 @@ namespace MusicDataBase
                     {
                         ParseAudio(folder);
                     }
+                    connection.Close();
+                    b = DateTime.Now;
                     //worker.ReportProgress((10));
                     if (worker.CancellationPending == true) //Перевіряємо, чи завдання було відмінено в ході виконання
                     {
@@ -190,6 +203,7 @@ namespace MusicDataBase
         }
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            String time = b.Subtract(a).ToString();
             if ((e.Cancelled == true))
             {
                 this.parsingStatusLabel.Text = "Статус: Відмінено!";
@@ -212,6 +226,7 @@ namespace MusicDataBase
                 this.notifyIcon1.Visible = true;
                 this.notifyIcon1.ShowBalloonTip(15,"Завершено!", "Знайдено: " + songCount + Environment.NewLine + "Проскановано: файлів " + totalFiles + ", каталогів " + totalFolders, ToolTipIcon.Info);
             }
+            this.toolStripProgressLabel.Text += " time:" + time;
         }
         private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -327,14 +342,36 @@ namespace MusicDataBase
             //dbConnect();
         }
 
-        private void dbInsert(String tableName, String columnsString, String valuesString, SQLiteConnection connection/*String[] columnsArray, String[] valuesArray*/)
+        private void dbInsert(String tableName, String[] columnsArray, String[] valuesArray, SQLiteConnection connection/*String[] columnsArray, String[] valuesArray*/)
         {
+            String conditionString = "";
+            String valuesString = "";
+            String columnsString = "";
+
+            if (columnsArray.Length != valuesArray.Length) return;//throw new Exception("Values != Columns number"){};//return
+            for (int i = 0; i < columnsArray.Length; i++)
+            {
+                columnsString += " '" + columnsArray[i] + "' ";
+                valuesString += " '" + valuesArray[i] + "' ";
+                conditionString += " " + columnsArray[i] + " = '" + valuesArray[i] + "' ";
+
+                if (i + 1 != valuesArray.Length)
+                {
+                    columnsString += ", "; //if not last element
+                    valuesString += ", "; //if not last element
+                    conditionString += " AND "; //if not last element
+                }
+            }
             //String columnsString = "name";//String.Join(", ", columnsArray);
            // String valuesString = "'" + textBox1.Text + "'";//String.Join(", ", valuesArray);
             
+//            SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columnsString + " ) " +
+//                                                       "SELECT " + valuesString + " " +
+ //                                                      "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + columnsString + " = " + valuesString/* + columnsArray[0] + " = " + valuesArray[0] + " AND " + columnsArray[1] + " = " + valuesArray[1]*/ + " );", connection);
+
             SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columnsString + " ) " +
                                                        "SELECT " + valuesString + " " +
-                                                       "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + columnsString + " = " + valuesString/* + columnsArray[0] + " = " + valuesArray[0] + " AND " + columnsArray[1] + " = " + valuesArray[1]*/ + " );", connection);
+                                                       "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + conditionString/* + columnsArray[0] + " = " + valuesArray[0] + " AND " + columnsArray[1] + " = " + valuesArray[1]*/ + " );", connection);
             insert22.ExecuteNonQuery();
             //connection.Close();
           //  List<Object> items;
@@ -348,6 +385,58 @@ namespace MusicDataBase
         //            }
         //        });
         //    }
+            //select track_name, artist_name from track tr Inner join artist art ON tr.artist_id = art.artist_id;
+            //select track.track_name, artist.artist_name from track inner join artist ON track.artist_id = artist.artist_id;
+        }
+
+        private String dbGetID(String tableName, String columnName, String value, SQLiteConnection connection)
+        {
+            String result = "NULL";
+            using (SQLiteCommand cmd = new SQLiteCommand("SELECT " + tableName + "_id" + " FROM " + tableName + " WHERE " + columnName + " = '" + value + "' ;", connection))
+            {
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    // Check is the reader has any rows at all before starting to read.
+                    if (reader.HasRows)
+                    {
+                        // Read advances to the next row.
+                        while (reader.Read())
+                        {
+                            // To avoid unexpected bugs access columns by name.
+                            //p.ID = reader.GetInt32(reader.GetOrdinal(columnName));
+
+                            int idColumnIndex = reader.GetOrdinal(tableName + "_id");
+                            // If a column is nullable always check for DBNull...
+                            if (!reader.IsDBNull(idColumnIndex))
+                            {
+                            //    p.MiddleName = reader.GetString(middleNameIndex);
+                                int id = reader.GetInt32(idColumnIndex);
+                                result = id.ToString();
+                            }
+                            //p.LastName = reader.GetString(reader.GetOrdinal("LastName"));
+                        }
+
+                    }
+                    return result;
+                }
+            }
+        }
+
+        private void initDbConnection()
+        {
+            connection = new SQLiteConnection(string.Format("Data Source={0};", databaseName));
+            connection.Open();
+            SQLiteCommand create = connection.CreateCommand();
+            create.CommandText = "CREATE TABLE IF NOT EXISTS `artist` (`artist_id`	INTEGER PRIMARY KEY AUTOINCREMENT, `artist_name` TEXT NOT NULL);";
+            if (create.ExecuteNonQuery() > 0)
+                MessageBox.Show("Created tables artist!");
+
+            SQLiteCommand create2 = connection.CreateCommand();
+            create2.CommandText = "CREATE TABLE IF NOT EXISTS `track` (`track_id`	INTEGER PRIMARY KEY AUTOINCREMENT, `track_name` TEXT NOT NULL, `artist_id`	INTEGER, FOREIGN KEY (artist_id) REFERENCES artist (artist_id));";
+            if (create2.ExecuteNonQuery() > 0)
+                MessageBox.Show("Created tables track!");
+            connection.Close();
+
         }
 
 

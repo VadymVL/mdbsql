@@ -194,14 +194,14 @@
             // toolStripProgressLabel
             // 
             this.toolStripProgressLabel.Name = "toolStripProgressLabel";
-            this.toolStripProgressLabel.Size = new System.Drawing.Size(542, 17);
+            this.toolStripProgressLabel.Size = new System.Drawing.Size(360, 20);
             this.toolStripProgressLabel.Spring = true;
             this.toolStripProgressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // toolStripProgressCountLabel
             // 
             this.toolStripProgressCountLabel.Name = "toolStripProgressCountLabel";
-            this.toolStripProgressCountLabel.Size = new System.Drawing.Size(0, 17);
+            this.toolStripProgressCountLabel.Size = new System.Drawing.Size(0, 20);
             this.toolStripProgressCountLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // notifyIcon1
