@@ -10,3 +10,23 @@ select artist.artist_name, album.album_name
 from artist, album, track
 where artist.artist_id = 1 AND track.artist_id = artist.artist_id AND album.album_id = track.album_id
 group by album.album_id;
+
+select artist.artist_name, album.album_name 
+from artist, album, artist_albums 
+where artist.artist_id = 1 AND artist_albums.artist_id = artist.artist_id AND artist_albums.album_id = album.album_id;
+
+select track.track_name
+from track
+where track.track_year = 1955;
+
+select track.track_name, artist.artist_name
+from track, artist
+where track.track_year = 1955 AND track.artist_id = artist.artist_id;
+
+select artist.artist_name, album.album_name, track.track_year
+from track, artist, album
+where track.track_year = 1955 AND track.artist_id = artist.artist_id;
+
+select artist.artist_name, album.album_name, track.track_year
+from track, artist, album
+where track.track_year = 2003 AND track.artist_id = artist.artist_id AND album.album_id = track.album_id GROUP by album.album_name;

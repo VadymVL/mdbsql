@@ -130,10 +130,10 @@ namespace MusicDataBase
                                     albumId = dbGetID("album", "album_name", album_name, connection);
                                 }
 
-                                if (!String.IsNullOrEmpty(albumId) && !String.IsNullOrEmpty(genreId))
+                                if (!String.IsNullOrEmpty(albumId))
                                 {
-                                    String[] artist_albums_columns = { "artist_id", "album_id", "album_year", "genre_id" };
-                                    String[] artist_albums_values = { artistId, albumId, track_year, genreId };
+                                    String[] artist_albums_columns = { "artist_id", "album_id" };
+                                    String[] artist_albums_values = { artistId, albumId };
                                     dbInsert("artist_albums", artist_albums_columns, artist_albums_values, connection);
                                 }
 
@@ -149,7 +149,7 @@ namespace MusicDataBase
                     }
                     catch (Exception e)
                     {
-                        System.Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace + Environment.NewLine + file.FullName);
+                        //System.Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace + Environment.NewLine + file.FullName);
                     }
                     
                 }
@@ -320,6 +320,11 @@ namespace MusicDataBase
             if (bw.WorkerSupportsCancellation == true)
             {
                 bw.CancelAsync();
+            }
+
+            if (connection.State != ConnectionState.Closed)
+            {
+                connection.Close();
             }
         }
 
@@ -503,7 +508,7 @@ namespace MusicDataBase
             createAlbumTable.ExecuteNonQuery();
 
             SQLiteCommand createArtistAlbumsTable = connection.CreateCommand();
-            createArtistAlbumsTable.CommandText = "CREATE TABLE IF NOT EXISTS `artist_albums` (`artist_id` INTEGER, `album_id` INTEGER, `genre_id` INTEGER, album_year INTEGER, PRIMARY KEY(artist_id, album_id), FOREIGN KEY (album_id) REFERENCES album (album_id), FOREIGN KEY (artist_id) REFERENCES artist (artist_id), FOREIGN KEY(`genre_id`) REFERENCES genre ( genre_id ));";
+            createArtistAlbumsTable.CommandText = "CREATE TABLE IF NOT EXISTS `artist_albums` (`artist_id` INTEGER, `album_id` INTEGER, PRIMARY KEY(artist_id, album_id), FOREIGN KEY (album_id) REFERENCES album (album_id), FOREIGN KEY (artist_id) REFERENCES artist (artist_id));";
             createArtistAlbumsTable.ExecuteNonQuery();
 
             SQLiteCommand createTrackTable = connection.CreateCommand();
