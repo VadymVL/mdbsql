@@ -1,0 +1,12 @@
+﻿select artist.artist_name, track.track_name, album.album_name, album.album_year, genre.genre_name
+from artist, track, album, genre 
+WHERE artist.artist_id = track.artist_id AND album.album_id = track.album_id AND genre.genre_id = album.genre_id;
+
+select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name 
+from artist, album, track, genre 
+where artist.artist_id = track.artist_id AND album.album_id = track.album_id AND genre.genre_id = track.genre_id;
+
+select artist.artist_name, album.album_name
+from artist, album, track
+where artist.artist_id = 1 AND track.artist_id = artist.artist_id AND album.album_id = track.album_id
+group by album.album_id;

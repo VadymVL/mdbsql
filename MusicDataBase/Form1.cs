@@ -84,33 +84,72 @@ namespace MusicDataBase
                         {
                             if (tagFile.Tag.IsEmpty == false) //Якщо у ньому є теги
                             {
+                                String artist_name = toUtf8(tagFile.Tag.FirstPerformer);
+                                String album_name = toUtf8(tagFile.Tag.Album);
+                                String genre_name = toUtf8(tagFile.Tag.FirstGenre);
+                                String track_year = toUtf8(tagFile.Tag.Year.ToString());
+                                String track_name = toUtf8(tagFile.Tag.Title);
+                                String track_path = toUtf8(tagFile.Name);
                                 //richTextBox1.AppendText(tagFile.Tag.ToString() + Environment.NewLine);
-                                String artist = tagFile.Tag.FirstPerformer;
-                                artist = toUtf8(artist);
-                                String title = tagFile.Tag.Title;
-                                title = toUtf8(title);
+                              //  String artist = tagFile.Tag.FirstPerformer;
+                                //artist = toUtf8(artist);
+                              //  String title = tagFile.Tag.Title;
+                                //title = toUtf8(title);
+                             //   title = toUtf8(title);
+                             //   artist = toUtf8(artist);
                                 //artist = toUTF8(artist);
                                 //artist = Encoding.GetEncoding(1251).GetString(Encoding.GetEncoding(1252).GetBytes(artist));
-                                songName = (String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                             //   songName = (String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
                                 //outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
-                                songCount++;
+                                if (String.IsNullOrEmpty(artist_name) || String.IsNullOrWhiteSpace(artist_name)) continue;
+                                if (String.IsNullOrEmpty(track_name) || String.IsNullOrWhiteSpace(track_name)) continue;
+
                           //      dbInsert("artist", "artist_name", "'" + artist + "'", connection);
                                 //TODO// - update dbInsert to handle multiple parameters, like several row inserts
                            //     dbInsert("track", "track_name, artist_id", "'" + title + "', '" + connection.LastInsertRowId + "'", connection);
                                 String[] artist_columns = {"artist_name"};
-                                String[] artist_values = { artist };
+                                String[] artist_values = { artist_name };
                                 dbInsert("artist", artist_columns, artist_values, connection);
-                                String artistId = dbGetID("artist", "artist_name", artist, connection);
-                                String[] track_columns = {"track_name", "artist_id"};
-                                String[] track_values = { title, artistId };
+                                String artistId = dbGetID("artist", "artist_name", artist_name, connection);
+
+                                String genreId = "";
+                                if (!String.IsNullOrEmpty(genre_name) || !String.IsNullOrWhiteSpace(genre_name))
+                                {
+                                    String[] genre_columns = { "genre_name" };
+                                    String[] genre_values = { genre_name };
+                                    dbInsert("genre", genre_columns, genre_values, connection);
+                                    genreId = dbGetID("genre", "genre_name", genre_name, connection);
+                                }
+
+                                String albumId = "";
+                                if (!String.IsNullOrEmpty(album_name) || !String.IsNullOrWhiteSpace(album_name))
+                                {
+                                    String[] album_columns = { "album_name" };
+                                    String[] album_values = { album_name };
+                                    dbInsert("album", album_columns, album_values, connection);
+                                    albumId = dbGetID("album", "album_name", album_name, connection);
+                                }
+
+                                if (!String.IsNullOrEmpty(albumId) && !String.IsNullOrEmpty(genreId))
+                                {
+                                    String[] artist_albums_columns = { "artist_id", "album_id", "album_year", "genre_id" };
+                                    String[] artist_albums_values = { artistId, albumId, track_year, genreId };
+                                    dbInsert("artist_albums", artist_albums_columns, artist_albums_values, connection);
+                                }
+
+                                String[] track_columns = { "track_name", "artist_id", "album_id", "track_path", "track_year", "genre_id" };
+                                String[] track_values = { track_name, artistId, albumId, track_path, track_year, genreId };
                                 dbInsert("track", track_columns, track_values, connection);
+
+                                songName = artist_name + " - " + track_name + Environment.NewLine;
+                                songCount++;
                             }
 
                         }
                     }
                     catch (Exception e)
                     {
-                        System.Console.WriteLine(e.Message);
+                        System.Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace + Environment.NewLine + file.FullName);
                     }
                     
                 }
@@ -131,9 +170,31 @@ namespace MusicDataBase
 
         public string toUtf8(string unknown) //Конвертуємо усі теги у UTF-8
         {
+            if (String.IsNullOrEmpty(unknown)) return unknown;
+
             return new string(unknown.ToCharArray().
                 Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Перевіряємо чи є текст кирилицею, та повертаємо utf-8
                 ToArray());
+        }
+
+        private string Win1251ToUTF8(string unknown)
+        {
+            return new string(unknown.ToCharArray(). //UNICODE to UTF8
+                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Перевіряємо чи є текст кирилицею, та повертаємо utf-8
+                ToArray());
+
+        }
+
+        private string UnicodeToUTF8(string source)
+        {
+            char[] unicodeArray = source.ToCharArray();
+            String unicodeString = new String(unicodeArray);
+ 
+            byte[] unicodeBytes = Encoding.Unicode.GetBytes(unicodeString);
+            byte[] utf8Bytes = Encoding.Convert(Encoding.Unicode, Encoding.UTF8, unicodeBytes);
+            source = Encoding.UTF8.GetString(utf8Bytes);
+            return source;
+
         }
 
         private void parseButton_click(object sender, EventArgs e)
@@ -351,9 +412,11 @@ namespace MusicDataBase
             if (columnsArray.Length != valuesArray.Length) return;//throw new Exception("Values != Columns number"){};//return
             for (int i = 0; i < columnsArray.Length; i++)
             {
-                columnsString += " '" + columnsArray[i] + "' ";
-                valuesString += " '" + valuesArray[i] + "' ";
-                conditionString += " " + columnsArray[i] + " = '" + valuesArray[i] + "' ";
+                String column = columnsArray[i];
+                String value = valuesArray[i].Replace("'", "''");
+                columnsString += " '" + column + "' ";
+                valuesString += " '" + value + "' ";
+                conditionString += " " + column + " = '" + value + "' ";
 
                 if (i + 1 != valuesArray.Length)
                 {
@@ -392,7 +455,7 @@ namespace MusicDataBase
         private String dbGetID(String tableName, String columnName, String value, SQLiteConnection connection)
         {
             String result = "NULL";
-            using (SQLiteCommand cmd = new SQLiteCommand("SELECT " + tableName + "_id" + " FROM " + tableName + " WHERE " + columnName + " = '" + value + "' ;", connection))
+            using (SQLiteCommand cmd = new SQLiteCommand("SELECT " + tableName + "_id" + " FROM " + tableName + " WHERE " + columnName + " = '" + value.Replace("'", "''") + "' ;", connection))
             {
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
@@ -426,17 +489,28 @@ namespace MusicDataBase
         {
             connection = new SQLiteConnection(string.Format("Data Source={0};", databaseName));
             connection.Open();
-            SQLiteCommand create = connection.CreateCommand();
-            create.CommandText = "CREATE TABLE IF NOT EXISTS `artist` (`artist_id`	INTEGER PRIMARY KEY AUTOINCREMENT, `artist_name` TEXT NOT NULL);";
-            if (create.ExecuteNonQuery() > 0)
-                MessageBox.Show("Created tables artist!");
 
-            SQLiteCommand create2 = connection.CreateCommand();
-            create2.CommandText = "CREATE TABLE IF NOT EXISTS `track` (`track_id`	INTEGER PRIMARY KEY AUTOINCREMENT, `track_name` TEXT NOT NULL, `artist_id`	INTEGER, FOREIGN KEY (artist_id) REFERENCES artist (artist_id));";
-            if (create2.ExecuteNonQuery() > 0)
-                MessageBox.Show("Created tables track!");
+            SQLiteCommand createArtistTable = connection.CreateCommand();
+            createArtistTable.CommandText = "CREATE TABLE IF NOT EXISTS `artist` (`artist_id` INTEGER PRIMARY KEY AUTOINCREMENT, `artist_name` TEXT NOT NULL);";
+            createArtistTable.ExecuteNonQuery();
+
+            SQLiteCommand createGenreTable = connection.CreateCommand();
+            createGenreTable.CommandText = "CREATE TABLE IF NOT EXISTS `genre` (`genre_id` INTEGER PRIMARY KEY AUTOINCREMENT, `genre_name` TEXT NOT NULL);";
+            createGenreTable.ExecuteNonQuery();
+            
+            SQLiteCommand createAlbumTable = connection.CreateCommand();
+            createAlbumTable.CommandText = "CREATE TABLE IF NOT EXISTS `album` (`album_id` INTEGER PRIMARY KEY AUTOINCREMENT, `album_name` TEXT NOT NULL);";//"CREATE TABLE IF NOT EXISTS `album` (`album_id`	INTEGER PRIMARY KEY AUTOINCREMENT, `album_name` TEXT NOT NULL, `artist_id`	INTEGER, FOREIGN KEY (artist_id) REFERENCES artist (artist_id), `album_year` INTEGER, `genre_id` INTEGER, FOREIGN KEY (genre_id) REFERENCES genre (genre_id));";
+            createAlbumTable.ExecuteNonQuery();
+
+            SQLiteCommand createArtistAlbumsTable = connection.CreateCommand();
+            createArtistAlbumsTable.CommandText = "CREATE TABLE IF NOT EXISTS `artist_albums` (`artist_id` INTEGER, `album_id` INTEGER, `genre_id` INTEGER, album_year INTEGER, PRIMARY KEY(artist_id, album_id), FOREIGN KEY (album_id) REFERENCES album (album_id), FOREIGN KEY (artist_id) REFERENCES artist (artist_id), FOREIGN KEY(`genre_id`) REFERENCES genre ( genre_id ));";
+            createArtistAlbumsTable.ExecuteNonQuery();
+
+            SQLiteCommand createTrackTable = connection.CreateCommand();
+            createTrackTable.CommandText = "CREATE TABLE IF NOT EXISTS `track` (`track_id` INTEGER PRIMARY KEY AUTOINCREMENT, `track_name` TEXT NOT NULL, `artist_id` INTEGER, `track_path` TEXT, `album_id` INTEGER, track_year INTEGER, genre_id INTEGER, FOREIGN KEY (album_id) REFERENCES album (album_id), FOREIGN KEY (artist_id) REFERENCES artist (artist_id), FOREIGN KEY(`genre_id`) REFERENCES genre ( genre_id ));";
+            createTrackTable.ExecuteNonQuery();
+            
             connection.Close();
-
         }
 
 
