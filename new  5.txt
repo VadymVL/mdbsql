@@ -30,3 +30,7 @@ where track.track_year = 1955 AND track.artist_id = artist.artist_id;
 select artist.artist_name, album.album_name, track.track_year
 from track, artist, album
 where track.track_year = 2003 AND track.artist_id = artist.artist_id AND album.album_id = track.album_id GROUP by album.album_name;
+
+select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path 
+from artist, track, album, genre 
+where track.artist_id = artist.artist_id AND track.album_id = album.album_id AND track.genre_id = genre.genre_id ;

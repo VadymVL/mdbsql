@@ -11,6 +11,7 @@ using System.IO;
 using System.Data.Common;
 using System.Data.SQLite;
 using TagLib;
+using WMPLib;
 
 namespace MusicDataBase
 {
@@ -406,6 +407,29 @@ namespace MusicDataBase
             String[] valuesArray = new String[] { id, name };
             //dbInsert("artist", columnsArray, valuesArray);
             //dbConnect();
+            if (connection == null || connection.State != ConnectionState.Open)
+            {
+                initDbConnection();
+                connection.Open();
+            }
+
+            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter("SELECT * FROM track", connection))
+            {
+                using (DataTable dataTable = new DataTable())
+                {
+                    sqlDataAdapter.Fill(dataTable);
+                    this.dataGridView1.DataSource = dataTable;
+                    DataGridViewButtonColumn playButtonColumn = new DataGridViewButtonColumn();
+                    playButtonColumn.Name = "Play";
+                    playButtonColumn.Text = "Play";
+                    playButtonColumn.UseColumnTextForButtonValue = true;
+
+                    if (dataGridView1.Columns["Play"] == null)
+                    {
+                        dataGridView1.Columns.Insert(0, playButtonColumn);
+                    }
+                }
+            }
         }
 
         private void dbInsert(String tableName, String[] columnsArray, String[] valuesArray, SQLiteConnection connection/*String[] columnsArray, String[] valuesArray*/)
@@ -518,6 +542,340 @@ namespace MusicDataBase
             connection.Close();
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (connection == null || connection.State != ConnectionState.Open)
+            {
+                initDbConnection();
+                connection.Open();
+            }
+
+            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter("SELECT * FROM artist", connection))
+            {
+                using (DataTable dataTable = new DataTable())
+                {
+                    sqlDataAdapter.Fill(dataTable);
+                    this.dataGridView1.DataSource = dataTable;
+
+                    if (dataGridView1.Columns["Play"] != null)
+                    {
+                        dataGridView1.Columns.Remove("Play");
+                    }
+                }
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (connection == null || connection.State != ConnectionState.Open)
+            {
+                initDbConnection();
+                connection.Open();
+            }
+
+            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter("SELECT * FROM album", connection))
+            {
+                using (DataTable dataTable = new DataTable())
+                {
+                    sqlDataAdapter.Fill(dataTable);
+                    this.dataGridView1.DataSource = dataTable;
+                    if (dataGridView1.Columns["Play"] != null)
+                    {
+                        dataGridView1.Columns.Remove("Play");
+                    }
+                }
+            }
+        }
+
+        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+            foreach (DataGridViewCell cell in row.Cells)
+            {
+                System.Console.WriteLine(cell.ToString() + " - " + cell.Value.ToString());
+            }
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex != -1 && e.ColumnIndex != -1)
+            {
+                dataGridView1.Rows[e.RowIndex].Selected = true;
+
+                if (e.ColumnIndex == dataGridView1.Columns["Play"].Index)
+                {
+                    if (dataGridView1.Columns.Contains("track_path"))
+                    //if (dataGridView1.Columns[e.ColumnIndex].HeaderText == "track_path")
+                    {
+
+                        String trackPath = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_path"].Index].FormattedValue.ToString();
+                        
+                        String artistName = "";
+                        String trackName = "";
+                        playingTrackName = "";
+
+                        if(dataGridView1.Columns.Contains("artist_name"))
+                        {
+                            artistName = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["artist_name"].Index].FormattedValue.ToString();
+                            playingTrackName = artistName + " - ";
+                        }
+
+                        if (dataGridView1.Columns.Contains("track_name"))
+                        {
+                            trackName = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_name"].Index].FormattedValue.ToString();
+                            playingTrackName += trackName;
+                        }
+                                             
+                        System.Console.WriteLine("PLAY!");
+                        //if (axWindowsMediaPlayer1.URL.Equals(trackPath))
+                        if (wmp.URL.Equals(trackPath))
+                        {
+                            //if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                            if (wmp.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                            {
+                                //axWindowsMediaPlayer1.Ctlcontrols.pause();
+                                wmp.controls.pause();
+                            }
+                            else
+                            {
+                                //axWindowsMediaPlayer1.Ctlcontrols.play();
+                                wmp.controls.play();
+                            }
+                        }
+                        else
+                        {
+                            //axWindowsMediaPlayer1.URL = trackPath;
+                            wmp.URL = trackPath;
+                            initPlayer();
+                            playingTrackName = "    " + playingTrackName + "    ";
+                            iScroll = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex != -1 && e.ColumnIndex != -1)
+            {
+                dataGridView1.Rows[e.RowIndex].Selected = true;
+                System.Console.WriteLine(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].FormattedValue.ToString());
+                System.Console.WriteLine(dataGridView1.Columns[e.ColumnIndex].HeaderText);
+                //if (dataGridView1.Columns.Contains("track_path"))
+                //if (e.ColumnIndex == dataGridView1.Columns["Play"].Index)
+                //{
+                    //if (dataGridView1.Columns.Contains("track_path"))
+                    //if (dataGridView1.Columns[e.ColumnIndex].HeaderText == "track_path")
+                   // {
+                    //    System.Console.WriteLine("PLAY!");
+                        // dataGridView1.Columns.C
+                     //   axWindowsMediaPlayer1.URL = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_path"].Index].FormattedValue.ToString();
+                   // }
+                //}
+            }
+        }
+
+        private void dataGridView1_MouseEnter(object sender, EventArgs e)
+        {
+            dataGridView1.Focus();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            String request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " + 
+                             "from artist, track, album, genre " +
+                             "where track.artist_id = artist.artist_id AND track.album_id = album.album_id AND track.genre_id = genre.genre_id ;";
+            fillDataGrid(request);
+        }
+
+        private void fillDataGrid(String request)
+        {
+            if (connection == null || connection.State != ConnectionState.Open)
+            {
+                initDbConnection();
+                connection.Open();
+            }
+
+            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter(request, connection))
+            {
+                using (DataTable dataTable = new DataTable())
+                {
+                    sqlDataAdapter.Fill(dataTable);
+                    this.dataGridView1.DataSource = dataTable;
+
+                    if (dataGridView1.Columns["track_path"] != null)
+                    {
+                        DataGridViewButtonColumn playButtonColumn = new DataGridViewButtonColumn();
+                        playButtonColumn.Name = "Play";
+                        playButtonColumn.Text = "Play";
+                        playButtonColumn.UseColumnTextForButtonValue = true;
+
+                        if (dataGridView1.Columns["Play"] == null)
+                        {
+                            dataGridView1.Columns.Insert(0, playButtonColumn);
+                        }
+                    }
+                    else
+                    {
+                        if (dataGridView1.Columns["Play"] != null)
+                        {
+                            dataGridView1.Columns.Remove("Play");
+                        }
+                    }
+                }
+            }
+        }
+
+
+        WindowsMediaPlayer wmp = new WindowsMediaPlayer();
+
+        private void initPlayer()
+        {
+            if (String.IsNullOrEmpty(wmp.URL)) return;
+            wmp.controls.play();
+
+            String tag = "";
+
+            if (pictureBox1.Image != null && pictureBox1.Image.Tag != null)
+                tag = pictureBox1.Image.Tag.ToString();
+            else
+                tag = "";
+
+            if ((String.IsNullOrEmpty(tag)) || (!String.IsNullOrEmpty(tag) && !tag.Equals(wmp.URL.ToString())))
+            {
+                try
+                {
+                    TagLib.File tagFile = TagLib.File.Create(wmp.URL);
+                    if (tagFile.Tag.Pictures != null && tagFile.Tag.Pictures.Length > 0)
+                    {
+                        MemoryStream ms = new MemoryStream(tagFile.Tag.Pictures[0].Data.Data);
+                        System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+                        pictureBox1.Image = image;
+                        pictureBox1.Image.Tag = wmp.URL;
+                    }
+                    else
+                    {
+                        pictureBox1.Image = Properties.Resources.DefaultPicture;
+                        pictureBox1.Image.Tag = null;
+                    }
+                }
+                catch (Exception exc)
+                {
+
+                }               
+            }
+
+            playTrackBar.Enabled = true;
+            timer1.Enabled = true;
+            timer1.Interval = 1000;
+            playerLabel.Text = "Playing";
+        }
+
+        private void playerPauseButton_Click(object sender, EventArgs e)
+        {
+            if (wmp == null || String.IsNullOrEmpty(wmp.URL)) return;
+            if (wmp.playState == WMPPlayState.wmppsPlaying)
+            {
+                wmp.controls.pause();
+                playerLabel.Text = "Paused";
+                playerPauseButton.Text = "Play";
+            } 
+            else
+            {
+                wmp.controls.play();
+                playerLabel.Text = "Playing";
+                playerPauseButton.Text = "Pause";
+            }
+        }
+
+        private void playTrackBar_Scroll(object sender, EventArgs e)
+        {
+            wmp.controls.currentPosition = playTrackBar.Value;
+        }
+
+        private int iScroll = 0;
+        private string playingTrackName = "";
+        private void timer1_Tick_1(object sender, EventArgs e)
+        {
+            playTrackBar.Maximum = Convert.ToInt32(wmp.currentMedia.duration);
+            playTrackBar.Value = Convert.ToInt32(wmp.controls.currentPosition);
+
+            if (wmp != null)
+            {
+                int s = (int)wmp.currentMedia.duration;
+                int h = s / 3600;
+                int m = (s - (h * 3600)) / 60;
+                s = s - (h * 3600 + m * 60);
+                playerDuration.Text = String.Format("{0:D}:{1:D2}:{2:D2}", h, m, s);
+
+                s = (int)wmp.controls.currentPosition;
+                h = s / 3600;
+                m = (s - (h * 3600)) / 60;
+                s = s - (h * 3600 + m * 60);
+                playerPlaytime.Text = String.Format("{0:D}:{1:D2}:{2:D2}", h, m, s);
+                ///
+                /*
+                iScroll = iScroll + 1;
+                int iLmt = playingTrackName.Length - iScroll;
+                if (iLmt < 30)
+                {
+                    iScroll = 0;
+                }
+
+                string str = playingTrackName.Substring(iScroll, 30);
+                playerTrackName.Text = str;
+                */
+                //
+                iScroll+=2;
+                if (iScroll >= playingTrackName.Length) iScroll = 0;
+                string str = playingTrackName.Substring(iScroll) + playingTrackName.Remove(iScroll); ;
+                playerTrackName.Text = str;
+            }
+            else
+            {
+                playerPlaytime.Text = "0:00:00";
+                playerDuration.Text = "0:00:00";
+            }
+        }
+
+        private void playerStopButton_Click(object sender, EventArgs e)
+        {
+            if (wmp != null)
+            {
+                wmp.controls.stop();
+                playerPlaytime.Text = "0:00:00";
+                playerDuration.Text = "0:00:00";
+                playerLabel.Text = " ";
+                playerPauseButton.Text = "Play";
+            }
+        }
+
+        private void volumeTrackBar_Scroll(object sender, EventArgs e)
+        {
+            wmp.settings.volume = volumeTrackBar.Value;
+            volumeLevel.Visible = true;
+            volumeLevel.Text = wmp.settings.volume + "%";
+        }
+
+        private void volumeTrackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            volumeLevel.Visible = false;
+        }
+
+        private void volumeTrackBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            volumeLevel.Visible = true;
+            volumeLevel.Text = wmp.settings.volume + "%";
+        }
+
+        private void playTrackBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            double dblValue;
+            dblValue = ((double)e.X / (double)playTrackBar.Width) * (playTrackBar.Maximum - playTrackBar.Minimum);
+            playTrackBar.Value = Convert.ToInt32(dblValue);
+            wmp.controls.currentPosition = playTrackBar.Value;
+        }
 
     }
 

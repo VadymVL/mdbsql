@@ -54,10 +54,31 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.playerPlaytime = new System.Windows.Forms.Label();
+            this.playerDuration = new System.Windows.Forms.Label();
+            this.playerLabel = new System.Windows.Forms.Label();
+            this.playerPauseButton = new System.Windows.Forms.Button();
+            this.playTrackBar = new System.Windows.Forms.TrackBar();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.playerStopButton = new System.Windows.Forms.Button();
+            this.playerTrackName = new System.Windows.Forms.Label();
+            this.volumeTrackBar = new System.Windows.Forms.TrackBar();
+            this.volumeLevel = new System.Windows.Forms.Label();
             this.chooseDirectoryGroup.SuspendLayout();
             this.parseStatusPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.playTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
             // openFolderButton
@@ -172,7 +193,7 @@
             // 
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(557, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(927, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -187,14 +208,14 @@
             this.toolStripProgressCountLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 358);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(557, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(927, 22);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripProgressLabel
             // 
             this.toolStripProgressLabel.Name = "toolStripProgressLabel";
-            this.toolStripProgressLabel.Size = new System.Drawing.Size(542, 17);
+            this.toolStripProgressLabel.Size = new System.Drawing.Size(912, 17);
             this.toolStripProgressLabel.Spring = true;
             this.toolStripProgressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -223,11 +244,11 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(75, 319);
+            this.button1.Location = new System.Drawing.Point(8, 332);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 8;
-            this.button1.Text = "insert";
+            this.button1.Text = "Tracks";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -268,11 +289,203 @@
             this.label2.TabIndex = 12;
             this.label2.Text = "name";
             // 
+            // dataGridView1
+            // 
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(551, 139);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.ShowEditingIcon = false;
+            this.dataGridView1.Size = new System.Drawing.Size(364, 216);
+            this.dataGridView1.TabIndex = 13;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
+            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
+            this.dataGridView1.MouseEnter += new System.EventHandler(this.dataGridView1_MouseEnter);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(89, 332);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 14;
+            this.button2.Text = "Artists";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(170, 332);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 15;
+            this.button3.Text = "Albums";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(13, 309);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 17;
+            this.button4.Text = "button4";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.volumeLevel);
+            this.groupBox1.Controls.Add(this.volumeTrackBar);
+            this.groupBox1.Controls.Add(this.playerTrackName);
+            this.groupBox1.Controls.Add(this.playerStopButton);
+            this.groupBox1.Controls.Add(this.pictureBox1);
+            this.groupBox1.Controls.Add(this.playerPlaytime);
+            this.groupBox1.Controls.Add(this.playerDuration);
+            this.groupBox1.Controls.Add(this.playerLabel);
+            this.groupBox1.Controls.Add(this.playerPauseButton);
+            this.groupBox1.Controls.Add(this.playTrackBar);
+            this.groupBox1.Location = new System.Drawing.Point(551, 12);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(364, 121);
+            this.groupBox1.TabIndex = 18;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Player";
+            // 
+            // playerPlaytime
+            // 
+            this.playerPlaytime.AutoSize = true;
+            this.playerPlaytime.Location = new System.Drawing.Point(135, 45);
+            this.playerPlaytime.Name = "playerPlaytime";
+            this.playerPlaytime.Size = new System.Drawing.Size(36, 17);
+            this.playerPlaytime.TabIndex = 5;
+            this.playerPlaytime.Text = "0:00";
+            // 
+            // playerDuration
+            // 
+            this.playerDuration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.playerDuration.AutoSize = true;
+            this.playerDuration.Location = new System.Drawing.Point(298, 45);
+            this.playerDuration.Name = "playerDuration";
+            this.playerDuration.Size = new System.Drawing.Size(36, 17);
+            this.playerDuration.TabIndex = 4;
+            this.playerDuration.Text = "0:00";
+            // 
+            // playerLabel
+            // 
+            this.playerLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.playerLabel.AutoSize = true;
+            this.playerLabel.Location = new System.Drawing.Point(203, 45);
+            this.playerLabel.Name = "playerLabel";
+            this.playerLabel.Size = new System.Drawing.Size(46, 17);
+            this.playerLabel.TabIndex = 3;
+            this.playerLabel.Text = "label3";
+            // 
+            // playerPauseButton
+            // 
+            this.playerPauseButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.playerPauseButton.Location = new System.Drawing.Point(155, 93);
+            this.playerPauseButton.Name = "playerPauseButton";
+            this.playerPauseButton.Size = new System.Drawing.Size(75, 23);
+            this.playerPauseButton.TabIndex = 2;
+            this.playerPauseButton.Text = "play";
+            this.playerPauseButton.UseVisualStyleBackColor = true;
+            this.playerPauseButton.Click += new System.EventHandler(this.playerPauseButton_Click);
+            // 
+            // playTrackBar
+            // 
+            this.playTrackBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.playTrackBar.Location = new System.Drawing.Point(126, 65);
+            this.playTrackBar.Name = "playTrackBar";
+            this.playTrackBar.Size = new System.Drawing.Size(221, 56);
+            this.playTrackBar.TabIndex = 0;
+            this.playTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.playTrackBar.Scroll += new System.EventHandler(this.playTrackBar_Scroll);
+            this.playTrackBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playTrackBar_MouseDown);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick_1);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::MusicDataBase.Properties.Resources.DefaultPicture;
+            this.pictureBox1.InitialImage = global::MusicDataBase.Properties.Resources.DefaultPicture;
+            this.pictureBox1.Location = new System.Drawing.Point(7, 21);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(95, 95);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 6;
+            this.pictureBox1.TabStop = false;
+            // 
+            // playerStopButton
+            // 
+            this.playerStopButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.playerStopButton.Location = new System.Drawing.Point(236, 93);
+            this.playerStopButton.Name = "playerStopButton";
+            this.playerStopButton.Size = new System.Drawing.Size(75, 23);
+            this.playerStopButton.TabIndex = 7;
+            this.playerStopButton.Text = "stop";
+            this.playerStopButton.UseVisualStyleBackColor = true;
+            this.playerStopButton.Click += new System.EventHandler(this.playerStopButton_Click);
+            // 
+            // playerTrackName
+            // 
+            this.playerTrackName.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.playerTrackName.AutoSize = true;
+            this.playerTrackName.BackColor = System.Drawing.Color.Transparent;
+            this.playerTrackName.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.playerTrackName.Location = new System.Drawing.Point(135, 12);
+            this.playerTrackName.Name = "playerTrackName";
+            this.playerTrackName.Size = new System.Drawing.Size(52, 17);
+            this.playerTrackName.TabIndex = 8;
+            this.playerTrackName.Text = "label3";
+            // 
+            // volumeTrackBar
+            // 
+            this.volumeTrackBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.volumeTrackBar.AutoSize = false;
+            this.volumeTrackBar.Location = new System.Drawing.Point(274, 12);
+            this.volumeTrackBar.Maximum = 100;
+            this.volumeTrackBar.Name = "volumeTrackBar";
+            this.volumeTrackBar.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.volumeTrackBar.Size = new System.Drawing.Size(85, 22);
+            this.volumeTrackBar.TabIndex = 9;
+            this.volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.volumeTrackBar.Value = 70;
+            this.volumeTrackBar.Scroll += new System.EventHandler(this.volumeTrackBar_Scroll);
+            this.volumeTrackBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseDown);
+            this.volumeTrackBar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.volumeTrackBar_MouseUp);
+            // 
+            // volumeLevel
+            // 
+            this.volumeLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.volumeLevel.AutoSize = true;
+            this.volumeLevel.Location = new System.Drawing.Point(233, 12);
+            this.volumeLevel.Name = "volumeLevel";
+            this.volumeLevel.Size = new System.Drawing.Size(44, 17);
+            this.volumeLevel.TabIndex = 10;
+            this.volumeLevel.Text = "100%";
+            this.volumeLevel.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(557, 380);
+            this.ClientSize = new System.Drawing.Size(927, 380);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDown1);
@@ -293,6 +506,12 @@
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.playTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.volumeTrackBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -324,6 +543,22 @@
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label playerLabel;
+        private System.Windows.Forms.Button playerPauseButton;
+        private System.Windows.Forms.TrackBar playTrackBar;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label playerPlaytime;
+        private System.Windows.Forms.Label playerDuration;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button playerStopButton;
+        private System.Windows.Forms.Label playerTrackName;
+        private System.Windows.Forms.TrackBar volumeTrackBar;
+        private System.Windows.Forms.Label volumeLevel;
     }
 }
 
