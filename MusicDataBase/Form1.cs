@@ -28,6 +28,7 @@ namespace MusicDataBase
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            loadAll_Click(null, null);
         }
 
         //Забезпечує виконання роботи у окремому потоці
@@ -266,6 +267,8 @@ namespace MusicDataBase
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             String time = b.Subtract(a).ToString();
+            time = time.Remove(time.Length - 3, 3);
+
             if ((e.Cancelled == true))
             {
                 this.parsingStatusLabel.Text = "Статус: Відмінено!";
@@ -287,8 +290,10 @@ namespace MusicDataBase
                 this.parsingProgressBar.Style = ProgressBarStyle.Blocks;
                 this.notifyIcon1.Visible = true;
                 this.notifyIcon1.ShowBalloonTip(15,"Завершено!", "Знайдено: " + songCount + Environment.NewLine + "Проскановано: файлів " + totalFiles + ", каталогів " + totalFolders, ToolTipIcon.Info);
+                loadAll.PerformClick();
             }
-            this.toolStripProgressLabel.Text += " time:" + time;
+            this.outPutText.AppendText("Час виконання: " + time);
+            this.toolStripProgressLabel.Text += " Час виконання: " + time;
         }
         private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -395,41 +400,6 @@ namespace MusicDataBase
                 Console.WriteLine("Name: " + reader["name"] + "\tScore: " + reader["score"]);
  
             Console.ReadKey();
-        }
-
-
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            String id = "'"+ numericUpDown1.Text +"'";
-            String name = "'" + textBox1.Text + "'";
-            String[] columnsArray = new String[] {"id", "name"};
-            String[] valuesArray = new String[] { id, name };
-            //dbInsert("artist", columnsArray, valuesArray);
-            //dbConnect();
-            if (connection == null || connection.State != ConnectionState.Open)
-            {
-                initDbConnection();
-                connection.Open();
-            }
-
-            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter("SELECT * FROM track", connection))
-            {
-                using (DataTable dataTable = new DataTable())
-                {
-                    sqlDataAdapter.Fill(dataTable);
-                    this.dataGridView1.DataSource = dataTable;
-                    DataGridViewButtonColumn playButtonColumn = new DataGridViewButtonColumn();
-                    playButtonColumn.Name = "Play";
-                    playButtonColumn.Text = "Play";
-                    playButtonColumn.UseColumnTextForButtonValue = true;
-
-                    if (dataGridView1.Columns["Play"] == null)
-                    {
-                        dataGridView1.Columns.Insert(0, playButtonColumn);
-                    }
-                }
-            }
         }
 
         private void dbInsert(String tableName, String[] columnsArray, String[] valuesArray, SQLiteConnection connection/*String[] columnsArray, String[] valuesArray*/)
@@ -542,79 +512,43 @@ namespace MusicDataBase
             connection.Close();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void loadArtists_Click(object sender, EventArgs e)
         {
-            if (connection == null || connection.State != ConnectionState.Open)
-            {
-                initDbConnection();
-                connection.Open();
-            }
-
-            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter("SELECT * FROM artist", connection))
-            {
-                using (DataTable dataTable = new DataTable())
-                {
-                    sqlDataAdapter.Fill(dataTable);
-                    this.dataGridView1.DataSource = dataTable;
-
-                    if (dataGridView1.Columns["Play"] != null)
-                    {
-                        dataGridView1.Columns.Remove("Play");
-                    }
-                }
-            }
+            String request = "select artist.artist_name, count(album.album_id) as 'albums_count' " + 
+                             "from artist, artist_albums, album " +
+                             "where album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id " +
+                             "group by artist.artist_id order by 2 desc;";
+            fillDataGrid(request);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void loadAlbums_Click(object sender, EventArgs e)
         {
-            if (connection == null || connection.State != ConnectionState.Open)
-            {
-                initDbConnection();
-                connection.Open();
-            }
-
-            using (SQLiteDataAdapter sqlDataAdapter = new SQLiteDataAdapter("SELECT * FROM album", connection))
-            {
-                using (DataTable dataTable = new DataTable())
-                {
-                    sqlDataAdapter.Fill(dataTable);
-                    this.dataGridView1.DataSource = dataTable;
-                    if (dataGridView1.Columns["Play"] != null)
-                    {
-                        dataGridView1.Columns.Remove("Play");
-                    }
-                }
-            }
-        }
-
-        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-            foreach (DataGridViewCell cell in row.Cells)
-            {
-                System.Console.WriteLine(cell.ToString() + " - " + cell.Value.ToString());
-            }
+            String request = "select album.album_name, count(track.track_id) as 'tracks_count' " +
+                             "from album, track " +
+                             "where album.album_id = track.album_id " +
+                             "group by album.album_id order by 2 desc;";
+            fillDataGrid(request);
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-                dataGridView1.Rows[e.RowIndex].Selected = true;
+      //          dataGridView1.Rows[e.RowIndex].Selected = true;
 
-                if (e.ColumnIndex == dataGridView1.Columns["Play"].Index)
+                if (dataGridView1.Columns["Play"] != null && e.ColumnIndex == dataGridView1.Columns["Play"].Index)
                 {
                     if (dataGridView1.Columns.Contains("track_path"))
                     //if (dataGridView1.Columns[e.ColumnIndex].HeaderText == "track_path")
                     {
 
                         String trackPath = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_path"].Index].FormattedValue.ToString();
-                        
+
                         String artistName = "";
                         String trackName = "";
                         playingTrackName = "";
 
-                        if(dataGridView1.Columns.Contains("artist_name"))
+                        if (dataGridView1.Columns.Contains("artist_name"))
                         {
                             artistName = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["artist_name"].Index].FormattedValue.ToString();
                             playingTrackName = artistName + " - ";
@@ -625,7 +559,7 @@ namespace MusicDataBase
                             trackName = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_name"].Index].FormattedValue.ToString();
                             playingTrackName += trackName;
                         }
-                                             
+
                         System.Console.WriteLine("PLAY!");
                         //if (axWindowsMediaPlayer1.URL.Equals(trackPath))
                         if (wmp.URL.Equals(trackPath))
@@ -635,11 +569,15 @@ namespace MusicDataBase
                             {
                                 //axWindowsMediaPlayer1.Ctlcontrols.pause();
                                 wmp.controls.pause();
+                                playerLabel.Text = "Paused";
+                                playerPauseButton.Text = "Play";
                             }
                             else
                             {
                                 //axWindowsMediaPlayer1.Ctlcontrols.play();
                                 wmp.controls.play();
+                                playerLabel.Text = "Playing";
+                                playerPauseButton.Text = "Pause";
                             }
                         }
                         else
@@ -659,9 +597,17 @@ namespace MusicDataBase
         {
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-                dataGridView1.Rows[e.RowIndex].Selected = true;
-                System.Console.WriteLine(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].FormattedValue.ToString());
-                System.Console.WriteLine(dataGridView1.Columns[e.ColumnIndex].HeaderText);
+    //            dataGridView1.Rows[e.RowIndex].Selected = true;
+                String value = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].FormattedValue.ToString();
+                String column = dataGridView1.Columns[e.ColumnIndex].HeaderText;
+                System.Console.WriteLine(value);
+                System.Console.WriteLine(column);
+
+
+                String request = "";
+                //fillDataGrid(request);
+
+
                 //if (dataGridView1.Columns.Contains("track_path"))
                 //if (e.ColumnIndex == dataGridView1.Columns["Play"].Index)
                 //{
@@ -681,7 +627,7 @@ namespace MusicDataBase
             dataGridView1.Focus();
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void loadAll_Click(object sender, EventArgs e)
         {
             String request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " + 
                              "from artist, track, album, genre " +
@@ -703,7 +649,17 @@ namespace MusicDataBase
                 {
                     sqlDataAdapter.Fill(dataTable);
                     this.dataGridView1.DataSource = dataTable;
-
+                    //this.comboBox1.DataSource = dataTable;
+                    //this.comboBox1.ValueMember = dataTable.Columns[0].ColumnName;
+                    //this.comboBox1.DisplayMember = dataTable.Columns[1].ColumnName;
+                    columnsComboBox.Items.Clear();
+                    foreach (DataColumn column in dataTable.Columns)
+                    {
+                        columnsComboBox.Items.Add(column.ColumnName);
+                    }
+                    columnsComboBox.SelectedIndex = 0;
+                    searchBox.Text = "пошук";
+   
                     if (dataGridView1.Columns["track_path"] != null)
                     {
                         DataGridViewButtonColumn playButtonColumn = new DataGridViewButtonColumn();
@@ -770,6 +726,7 @@ namespace MusicDataBase
             timer1.Enabled = true;
             timer1.Interval = 1000;
             playerLabel.Text = "Playing";
+            playerPauseButton.Text = "Pause";
         }
 
         private void playerPauseButton_Click(object sender, EventArgs e)
@@ -875,6 +832,53 @@ namespace MusicDataBase
             dblValue = ((double)e.X / (double)playTrackBar.Width) * (playTrackBar.Maximum - playTrackBar.Minimum);
             playTrackBar.Value = Convert.ToInt32(dblValue);
             wmp.controls.currentPosition = playTrackBar.Value;
+        }
+
+        private void searchBox_TextChanged(object sender, EventArgs e)
+        {
+            if (searchBox.Text.Equals("пошук")) return;
+            try
+            {
+                String statement = string.Format(" like '%{0}%'", searchBox.Text.Trim().Replace("'", "''"));
+                String column = columnsComboBox.SelectedItem.ToString();
+                if(column.Contains("year") || column.Contains("count")) column = "Convert(" + column + ", 'System.String')";
+
+                ((DataTable)dataGridView1.DataSource).DefaultView.RowFilter = column + statement;
+            }
+            catch (Exception exc) { Console.WriteLine(exc.Message); }
+        }
+
+        private void columnsComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            searchBox_TextChanged(sender, e);
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            if (dataGridView1.RowCount == 0)
+            {
+                DialogResult result = MessageBox.Show("Додати аудіофайли до фонотеки?", "Увага!", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    openFolderButton.PerformClick();
+                    parseButton.PerformClick();
+                }
+            }
+        }
+
+        private void searchBox_Enter(object sender, EventArgs e)
+        {
+            searchBox.Text = "";
+            searchBox.ForeColor = SystemColors.WindowText;
+        }
+
+        private void searchBox_Leave(object sender, EventArgs e)
+        {
+            if (searchBox.Text == "")
+            {
+                searchBox.Text = "пошук";
+                searchBox.ForeColor = SystemColors.InactiveCaptionText;
+            }
         }
 
     }

@@ -1,0 +1,52 @@
+select artist.artist_name, count(album.album_id) as 'albums_count' 
+from artist, artist_albums, album 
+where artist.artist_id = artist_albums.artist_id AND album.album_id = artist_albums.album_id;
+
+select artist.artist_name
+from artist, artist_albums, album 
+where artist.artist_id = artist_albums.artist_id AND album.album_id = artist_albums.album_id 
+group by artist.artist_id;
+
+select artist.artist_name 
+from artist 
+group by artist.artist_id;
+
+select artist.artist_name, count(album.album_id) as 'albums_count'
+from artist, artist_albums 
+where 
+group by artist.artist_id;
+
+select artist.artist_name, count(album.album_id) as 'albums_count'
+from artist, artist_albums, album 
+where album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id 
+group by artist.artist_id;
+
+select artist.artist_name, count(album.album_id) as 'albums_count'
+from artist, artist_albums, album 
+where album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id 
+group by artist.artist_id order by 2 desc;
+
+select album.album_name, count(track.track_id) as 'tracks_count'
+from album, track
+where album.album_id = track.album_id  
+group by album.album_id order by 2 desc;
+
+select artist.artist_name, album.album_name, count(track.track_id) as 'tracks_count'
+from artist, artist_albums, album, track
+where album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id and track.album_id = album.album_id and
+group by artist.artist_id order by 3 desc;
+
+select artist.artist_name, album.album_name, count(track.track_id) as 'tracks_count'
+from album, track, artist, artist_albums
+where album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id 
+group by album.album_id order by 3 desc;
+
+select artist.artist_name, track.track_id, album.album_name
+from album, track, artist
+where album.album_name = 'Rolling Stone Magazine''s 500 Greatest Songs Of All Time' and track.album_id = album.album_id and artist.artist_id = track.artist_id;
+group by track.track_id;
+
+select artist.artist_name, album.album_name, count(DISTINCT track.track_id) as 'tracks_count', count(DISTINCT artist_albums.artist_id) <=2
+from album, track, artist, artist_albums
+where album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id
+group by album.album_id order by 3 desc;
