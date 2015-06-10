@@ -593,19 +593,99 @@ namespace MusicDataBase
             }
         }
 
+        private List<DataGridCell> selectedCells = new List<DataGridCell>();
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
     //            dataGridView1.Rows[e.RowIndex].Selected = true;
-                String value = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].FormattedValue.ToString();
+                String value = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].FormattedValue.ToString().Replace("'", "''");
                 String column = dataGridView1.Columns[e.ColumnIndex].HeaderText;
+                DataGridCell cell = new DataGridCell(e.RowIndex, e.ColumnIndex);
+                selectedCells.Add(cell);
                 System.Console.WriteLine(value);
                 System.Console.WriteLine(column);
 
 
                 String request = "";
-                //fillDataGrid(request);
+
+                switch (column)
+                {
+                    case "artist_name":
+                        {
+                            request = "select artist.artist_name, album.album_name, count(DISTINCT track.track_id) as 'tracks_count' " +
+                                      "from album, track, artist, artist_albums " +
+                                      "where artist.artist_name = '" + value + "' and album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id and track.artist_id = artist.artist_id " +
+                                      "group by album.album_id order by 3 desc;";
+                            break;
+                        }
+
+                    case "album_name":
+                        {
+                            request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " +
+                                      "from album, track, artist, genre  " +
+                                      "where album.album_name = '" + value + "' and track.album_id = album.album_id and artist.artist_id = track.artist_id and track.genre_id = genre.genre_id " +
+                                      "group by track.track_id;";
+                            break;
+                        }
+
+                    case "track_name":
+                        {
+                            request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " +
+                                      "from album, track, artist, artist_albums, genre " +
+                                      "where track.track_name = '" + value +"' and album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id and track.artist_id = artist.artist_id and track.genre_id = genre.genre_id " +
+                                      "group by album.album_id order by 3 desc;";
+                            break;
+                        }
+
+                    case "genre_name":
+                        {
+                            request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " +
+                                      "from album, track, artist, artist_albums, genre " +
+                                      "where genre.genre_name = '" + value + "' and track.genre_id = genre.genre_id and album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id and track.artist_id = artist.artist_id " +
+                                      "group by album.album_id order by 3 desc;";
+                            break;
+                        }
+
+                    case "track_year":
+                        {
+                            request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " +
+                                      "from album, track, artist, artist_albums, genre " +
+                                      "where track.track_year = '" + value + "' and album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id and track.artist_id = artist.artist_id and track.genre_id = genre.genre_id " +
+                                      "group by album.album_id order by 3 desc;";
+                            break;
+                        }
+
+                    case "tracks_count":
+                        {
+                            String albumName = dataGridView1.Rows[e.RowIndex].Cells["album_name"].FormattedValue.ToString().Replace("'", "''");
+                            request = "select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path " +
+                                      "from album, track, artist, genre  " +
+                                      "where album.album_name = '" + albumName + "' and track.album_id = album.album_id and artist.artist_id = track.artist_id and track.genre_id = genre.genre_id " +
+                                      "group by track.track_id;";
+                            break;
+                        }
+
+                    case "albums_count":
+                        {
+                            String artistName = dataGridView1.Rows[e.RowIndex].Cells["artist_name"].FormattedValue.ToString().Replace("'", "''");
+                            request = "select artist.artist_name, album.album_name, count(DISTINCT track.track_id) as 'tracks_count' " +
+                                      "from album, track, artist, artist_albums " +
+                                      "where artist.artist_name = '" + artistName + "' and album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id and track.artist_id = artist.artist_id " +
+                                      "group by album.album_id order by 3 desc;";
+                            break;
+                        }
+
+                    case "track_path":
+                        {
+                            //System.Diagnostics.Process.Start("explorer.exe", "/select, \"" + value +"\"");
+                            System.Diagnostics.Process.Start("explorer.exe", string.Format("/select,\"{0}\"", value));
+                            break;
+                        }
+                }
+
+
+                fillDataGrid(request);
 
 
                 //if (dataGridView1.Columns.Contains("track_path"))
@@ -635,8 +715,12 @@ namespace MusicDataBase
             fillDataGrid(request);
         }
 
+        private List<DataTable> tables = new List<DataTable>();
+
         private void fillDataGrid(String request)
         {
+            if (String.IsNullOrEmpty(request)) return;
+
             if (connection == null || connection.State != ConnectionState.Open)
             {
                 initDbConnection();
@@ -647,8 +731,12 @@ namespace MusicDataBase
             {
                 using (DataTable dataTable = new DataTable())
                 {
+                    dataGridView1.Columns.Clear();
+
                     sqlDataAdapter.Fill(dataTable);
                     this.dataGridView1.DataSource = dataTable;
+                    if (tables.Count == 1) backButton.Enabled = true;
+                    tables.Add(dataTable);
                     //this.comboBox1.DataSource = dataTable;
                     //this.comboBox1.ValueMember = dataTable.Columns[0].ColumnName;
                     //this.comboBox1.DisplayMember = dataTable.Columns[1].ColumnName;
@@ -879,6 +967,55 @@ namespace MusicDataBase
                 searchBox.Text = "пошук";
                 searchBox.ForeColor = SystemColors.InactiveCaptionText;
             }
+        }
+
+        private void backButton_Click(object sender, EventArgs e)
+        {
+            if (tables.Count > 1) //2 and more
+            {
+                try
+                {
+                    tables.RemoveAt(tables.Count - 1); //remove current table (it is showing on screen)
+                    DataTable dataTable = tables[tables.Count - 1]; //get previous table
+                    dataGridView1.Columns.Clear();
+                    this.dataGridView1.DataSource = dataTable;
+
+                    columnsComboBox.Items.Clear();
+                    foreach (DataColumn column in dataTable.Columns)
+                    {
+                        columnsComboBox.Items.Add(column.ColumnName);
+                    }
+                    columnsComboBox.SelectedIndex = 0;
+                    searchBox.Text = "пошук";
+
+                    if (dataGridView1.Columns["track_path"] != null)
+                    {
+                        DataGridViewButtonColumn playButtonColumn = new DataGridViewButtonColumn();
+                        playButtonColumn.Name = "Play";
+                        playButtonColumn.Text = "Play";
+                        playButtonColumn.UseColumnTextForButtonValue = true;
+
+                        if (dataGridView1.Columns["Play"] == null)
+                        {
+                            dataGridView1.Columns.Insert(0, playButtonColumn);
+                        }
+                    }
+
+                    if (selectedCells.Count > 0)
+                    {
+                        DataGridCell cell = selectedCells[selectedCells.Count - 1];
+                        selectedCells.RemoveAt(selectedCells.Count - 1);
+                        dataGridView1.CurrentCell = dataGridView1.Rows[cell.RowNumber].Cells[cell.ColumnNumber];
+                    }
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc.Message);
+                }
+
+                if(tables.Count == 1) backButton.Enabled = false;
+            }
+            else backButton.Enabled = false;  
         }
 
     }

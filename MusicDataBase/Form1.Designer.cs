@@ -68,7 +68,7 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.columnsComboBox = new System.Windows.Forms.ComboBox();
-            this.button5 = new System.Windows.Forms.Button();
+            this.backButton = new System.Windows.Forms.Button();
             this.searchBox = new System.Windows.Forms.TextBox();
             this.chooseDirectoryGroup.SuspendLayout();
             this.parseStatusPanel.SuspendLayout();
@@ -273,8 +273,8 @@
             // 
             // loadArtists
             // 
-            this.loadArtists.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.loadArtists.Location = new System.Drawing.Point(480, 11);
+            this.loadArtists.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.loadArtists.Location = new System.Drawing.Point(480, 10);
             this.loadArtists.Name = "loadArtists";
             this.loadArtists.Size = new System.Drawing.Size(97, 23);
             this.loadArtists.TabIndex = 14;
@@ -284,8 +284,8 @@
             // 
             // loadAlbums
             // 
-            this.loadAlbums.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.loadAlbums.Location = new System.Drawing.Point(583, 11);
+            this.loadAlbums.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.loadAlbums.Location = new System.Drawing.Point(583, 10);
             this.loadAlbums.Name = "loadAlbums";
             this.loadAlbums.Size = new System.Drawing.Size(97, 23);
             this.loadAlbums.TabIndex = 15;
@@ -295,8 +295,8 @@
             // 
             // loadAll
             // 
-            this.loadAll.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.loadAll.Location = new System.Drawing.Point(377, 11);
+            this.loadAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.loadAll.Location = new System.Drawing.Point(377, 10);
             this.loadAll.Name = "loadAll";
             this.loadAll.Size = new System.Drawing.Size(97, 23);
             this.loadAll.TabIndex = 17;
@@ -459,7 +459,7 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.columnsComboBox);
-            this.groupBox2.Controls.Add(this.button5);
+            this.groupBox2.Controls.Add(this.backButton);
             this.groupBox2.Controls.Add(this.searchBox);
             this.groupBox2.Controls.Add(this.loadAll);
             this.groupBox2.Controls.Add(this.loadArtists);
@@ -472,30 +472,32 @@
             // 
             // columnsComboBox
             // 
-            this.columnsComboBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.columnsComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.columnsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.columnsComboBox.FormattingEnabled = true;
-            this.columnsComboBox.Location = new System.Drawing.Point(157, 10);
+            this.columnsComboBox.Location = new System.Drawing.Point(201, 10);
             this.columnsComboBox.Name = "columnsComboBox";
             this.columnsComboBox.Size = new System.Drawing.Size(111, 24);
             this.columnsComboBox.TabIndex = 20;
             this.columnsComboBox.SelectedIndexChanged += new System.EventHandler(this.columnsComboBox_SelectedIndexChanged);
             // 
-            // button5
+            // backButton
             // 
-            this.button5.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.button5.Location = new System.Drawing.Point(7, 11);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(39, 23);
-            this.button5.TabIndex = 19;
-            this.button5.Text = "<<";
-            this.button5.UseVisualStyleBackColor = true;
+            this.backButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.backButton.Enabled = false;
+            this.backButton.Location = new System.Drawing.Point(7, 11);
+            this.backButton.Name = "backButton";
+            this.backButton.Size = new System.Drawing.Size(82, 23);
+            this.backButton.TabIndex = 19;
+            this.backButton.Text = "<< Назад";
+            this.backButton.UseVisualStyleBackColor = true;
+            this.backButton.Click += new System.EventHandler(this.backButton_Click);
             // 
             // searchBox
             // 
-            this.searchBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.searchBox.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-            this.searchBox.Location = new System.Drawing.Point(51, 11);
+            this.searchBox.Location = new System.Drawing.Point(95, 10);
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(100, 22);
             this.searchBox.TabIndex = 18;
@@ -582,7 +584,7 @@
         private System.Windows.Forms.Label volumeLevel;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button backButton;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.ComboBox columnsComboBox;
     }

@@ -64,3 +64,19 @@ select artist.artist_name, album.album_name, count(DISTINCT artist_albums.artist
 from album, track, artist, artist_albums
 where album.album_id = track.album_id and album.album_id = artist_albums.album_id and artist_albums.artist_id = artist.artist_id
 group by album.album_id order by 3 desc;
+
+select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path 
+from album, track, artist, genre, artist_albums
+where album.album_name = 'Smash Americana- Mixed Edition (Collection)' and track.album_id = album.album_id and artist_albums.album_id = album.album_id and artist.artist_id = artist_albums.artist_id and track.genre_id = genre.genre_id 
+group by track.track_id;
+
+select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path 
+from album, track, artist, genre
+where album.album_name = 'Smash Americana- Mixed Edition (Collection)' and track.album_id = album.album_id and artist.artist_id = track.artist_id
+group by track.track_id;
+
+select artist.artist_name, track.track_name, album.album_name, track.track_year, genre.genre_name, track.track_path 
+from album, track, artist, genre, artist_albums
+where album.album_name = 'Smash Americana- Mixed Edition (Collection)' and track.album_id = album.album_id and artist_albums.album_id = album.album_id and artist.artist_id = artist_albums.artist_id and genre.genre_id = 
+ifnull((select genre.genre_id from genre where genre.genre_name = ' '),track.genre_id)
+group by track.track_id;
