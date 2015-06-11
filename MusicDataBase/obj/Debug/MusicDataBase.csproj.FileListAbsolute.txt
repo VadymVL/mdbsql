@@ -4,9 +4,15 @@ c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\policy.2.0.taglib-sharp.dll
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\taglib-sharp.dll
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\policy.2.0.taglib-sharp.config
-c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.csprojResolveAssemblyReference.cache
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.Form1.resources
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.Properties.Resources.resources
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.csproj.GenerateResource.Cache
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.exe
 c:\users\vadym\documents\visual studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.pdb
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\Interop.WMPLib.dll
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\AxInterop.WMPLib.dll
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Debug\MusicDataBase.csproj.ResolveComReference.cache
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\System.Data.SQLite.dll
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\System.Data.SQLite.xml
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\Interop.WMPLib.dll
+C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\bin\Debug\AxInterop.WMPLib.dll

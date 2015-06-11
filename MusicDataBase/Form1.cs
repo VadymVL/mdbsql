@@ -35,9 +35,11 @@ namespace MusicDataBase
         private BackgroundWorker bw;
         //Зберігає шлях до обранного каталогу
         private String folderName = "";
+        //Лічильники стану
         private int totalFolders = 0;
         private int totalFiles = 0;
         private int songCount = 0;
+        //Ім'я бази даних
         const string databaseName = @"cyber.db";
         SQLiteConnection connection;
         DateTime a = new DateTime();
@@ -92,23 +94,10 @@ namespace MusicDataBase
                                 String track_year = toUtf8(tagFile.Tag.Year.ToString());
                                 String track_name = toUtf8(tagFile.Tag.Title);
                                 String track_path = toUtf8(tagFile.Name);
-                                //richTextBox1.AppendText(tagFile.Tag.ToString() + Environment.NewLine);
-                              //  String artist = tagFile.Tag.FirstPerformer;
-                                //artist = toUtf8(artist);
-                              //  String title = tagFile.Tag.Title;
-                                //title = toUtf8(title);
-                             //   title = toUtf8(title);
-                             //   artist = toUtf8(artist);
-                                //artist = toUTF8(artist);
-                                //artist = Encoding.GetEncoding(1251).GetString(Encoding.GetEncoding(1252).GetBytes(artist));
-                             //   songName = (String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
-                                //outPutText.AppendText(String.IsNullOrEmpty(artist) ? "" : artist + " - " + title + Environment.NewLine);
+                                
                                 if (String.IsNullOrEmpty(artist_name) || String.IsNullOrWhiteSpace(artist_name)) continue;
                                 if (String.IsNullOrEmpty(track_name) || String.IsNullOrWhiteSpace(track_name)) continue;
 
-                          //      dbInsert("artist", "artist_name", "'" + artist + "'", connection);
-                                //TODO// - update dbInsert to handle multiple parameters, like several row inserts
-                           //     dbInsert("track", "track_name, artist_id", "'" + title + "', '" + connection.LastInsertRowId + "'", connection);
                                 String[] artist_columns = {"artist_name"};
                                 String[] artist_values = { artist_name };
                                 dbInsert("artist", artist_columns, artist_values, connection);
@@ -151,7 +140,7 @@ namespace MusicDataBase
                     }
                     catch (Exception e)
                     {
-                        //System.Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace + Environment.NewLine + file.FullName);
+                        System.Console.WriteLine(e.Message + Environment.NewLine + file.FullName);
                     }
                     
                 }
@@ -177,26 +166,6 @@ namespace MusicDataBase
             return new string(unknown.ToCharArray().
                 Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Перевіряємо чи є текст кирилицею, та повертаємо utf-8
                 ToArray());
-        }
-
-        private string Win1251ToUTF8(string unknown)
-        {
-            return new string(unknown.ToCharArray(). //UNICODE to UTF8
-                Select(x => ((x + 848) >= 'А' && (x + 848) <= 'ё') ? (char)(x + 848) : x). //Перевіряємо чи є текст кирилицею, та повертаємо utf-8
-                ToArray());
-
-        }
-
-        private string UnicodeToUTF8(string source)
-        {
-            char[] unicodeArray = source.ToCharArray();
-            String unicodeString = new String(unicodeArray);
- 
-            byte[] unicodeBytes = Encoding.Unicode.GetBytes(unicodeString);
-            byte[] utf8Bytes = Encoding.Convert(Encoding.Unicode, Encoding.UTF8, unicodeBytes);
-            source = Encoding.UTF8.GetString(utf8Bytes);
-            return source;
-
         }
 
         private void parseButton_click(object sender, EventArgs e)
@@ -230,17 +199,12 @@ namespace MusicDataBase
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            //for (int i = 1; (i <= 10); i++)
-            //{
                 if ((worker.CancellationPending == true))
                 {
                     e.Cancel = true;
-                    //break;
                 }
                 else
                 {
-                    // Perform a time consuming operation and report progress.
-                    //System.Threading.Thread.Sleep(500);
                     a = DateTime.Now;
                     DirectoryInfo folder = new DirectoryInfo(folderName);
                     initDbConnection();
@@ -256,14 +220,13 @@ namespace MusicDataBase
                     }
                     connection.Close();
                     b = DateTime.Now;
-                    //worker.ReportProgress((10));
                     if (worker.CancellationPending == true) //Перевіряємо, чи завдання було відмінено в ході виконання
                     {
                         e.Cancel = true;
                     }
                 }
-            //}
         }
+
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             String time = b.Subtract(a).ToString();
@@ -297,8 +260,6 @@ namespace MusicDataBase
         }
         private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            //this.parsingStatusLabel.Text = (e.ProgressPercentage.ToString() + "%");
-            //this.outPutText.AppendText(e.UserState.ToString());
             if (e.UserState != null && bw.CancellationPending == false && showProcessCheckBox.Checked == true)
             {
                 String[] result = (String[])e.UserState;
@@ -334,81 +295,13 @@ namespace MusicDataBase
             }
         }
 
-        static int counterId = 1;
-        private static void dbConnect()
-        {
-            
-            const string databaseName = @"cyber.db";
-            SQLiteConnection connection =
-                new SQLiteConnection(string.Format("Data Source={0};", databaseName));
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand("INSERT INTO 'artist' ('id', 'name') VALUES (1, 'Вася');", connection);
-            //command.ExecuteNonQuery();
-            SQLiteCommand insert = new SQLiteCommand("IF EXISTS (SELECT * FROM 'artist' WHERE 'name'='Вася') " +
-                                                      "UPDATE 'artist' SET (...) WHERE Column1='SomeValue' " +
-                                                      "ELSE INSERT INTO 'artist' VALUES (...)", connection);
-
-            SQLiteCommand insert2 = new SQLiteCommand("INSERT INTO memos(id,text) " + 
-                                                      "SELECT 5, 'text to insert' " +
-                                                      "WHERE NOT EXISTS (SELECT 1 FROM memos WHERE id = 5 AND text = 'text to insert');", connection);
-
-            SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO artist(id, name) " +
-                                                      "SELECT " + counterId + ", 'Вася' " +
-                                                      "WHERE NOT EXISTS (SELECT 1 FROM artist WHERE id = " + counterId + " AND name = 'Вася');", connection);
-            insert22.ExecuteNonQuery();
-
-            //SQLiteCommand insert3 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columns + " ) " + 
-             //                                          "SELECT " + values + " " +
-             //                                          "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE id = 5 AND text = 'text to insert');", connection);
-            connection.Close();
-            counterId++;
-        }
-
-        static SQLiteConnection m_dbConnection;
-        public static void Run()
-        {
-            // http://blog.tigrangasparian.com/2012/02/09/getting-started-with-sqlite-in-c-part-one/
-            // 
-            // ### Create the database
-            // SQLiteConnection.CreateFile("MyDatabase.sqlite");
- 
-            // ### Connect to the database
-            m_dbConnection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
-            m_dbConnection.Open();
- 
-            // ### Create a table
-            // string sql = "CREATE TABLE highscores (name VARCHAR(20), score INT)";
-            // SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-            // command.ExecuteNonQuery();
- 
-            // ### Add some data to the table
-            // string sql = "insert into highscores (name, score) values ('Me', 3000)";
-            // SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-            // command.ExecuteNonQuery();
-            // sql = "insert into highscores (name, score) values ('Myself', 6000)";
-            // command = new SQLiteCommand(sql, m_dbConnection);
-            // command.ExecuteNonQuery();
-            // sql = "insert into highscores (name, score) values ('And I', 9001)";
-            // command = new SQLiteCommand(sql, m_dbConnection);
-            // command.ExecuteNonQuery();
- 
-            // ### select the data
-            string sql = "select * from highscores order by score desc";
-            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-                Console.WriteLine("Name: " + reader["name"] + "\tScore: " + reader["score"]);
- 
-            Console.ReadKey();
-        }
-
-        private void dbInsert(String tableName, String[] columnsArray, String[] valuesArray, SQLiteConnection connection/*String[] columnsArray, String[] valuesArray*/)
+        private void dbInsert(String tableName, String[] columnsArray, String[] valuesArray, SQLiteConnection connection)
         {
             String conditionString = "";
             String valuesString = "";
             String columnsString = "";
 
-            if (columnsArray.Length != valuesArray.Length) return;//throw new Exception("Values != Columns number"){};//return
+            if (columnsArray.Length != valuesArray.Length) return;
             for (int i = 0; i < columnsArray.Length; i++)
             {
                 String column = columnsArray[i];
@@ -424,31 +317,11 @@ namespace MusicDataBase
                     conditionString += " AND "; //if not last element
                 }
             }
-            //String columnsString = "name";//String.Join(", ", columnsArray);
-           // String valuesString = "'" + textBox1.Text + "'";//String.Join(", ", valuesArray);
             
-//            SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columnsString + " ) " +
-//                                                       "SELECT " + valuesString + " " +
- //                                                      "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + columnsString + " = " + valuesString/* + columnsArray[0] + " = " + valuesArray[0] + " AND " + columnsArray[1] + " = " + valuesArray[1]*/ + " );", connection);
-
-            SQLiteCommand insert22 = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columnsString + " ) " +
+            SQLiteCommand insert = new SQLiteCommand("INSERT INTO " + tableName + " ( " + columnsString + " ) " +
                                                        "SELECT " + valuesString + " " +
-                                                       "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + conditionString/* + columnsArray[0] + " = " + valuesArray[0] + " AND " + columnsArray[1] + " = " + valuesArray[1]*/ + " );", connection);
-            insert22.ExecuteNonQuery();
-            //connection.Close();
-          //  List<Object> items;
-         //   using (var db = new SQLiteConnection(@"cyber.db"))
-          //  {
-         //       db.RunInTransaction(() =>
-         ////       {
-         //           foreach (var item in items)
-         //           {
-         //               db.Insert(item);
-        //            }
-        //        });
-        //    }
-            //select track_name, artist_name from track tr Inner join artist art ON tr.artist_id = art.artist_id;
-            //select track.track_name, artist.artist_name from track inner join artist ON track.artist_id = artist.artist_id;
+                                                       "WHERE NOT EXISTS (SELECT 1 FROM " + tableName + " WHERE " + conditionString + " );", connection);
+            insert.ExecuteNonQuery();
         }
 
         private String dbGetID(String tableName, String columnName, String value, SQLiteConnection connection)
@@ -458,24 +331,20 @@ namespace MusicDataBase
             {
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
-                    // Check is the reader has any rows at all before starting to read.
+                    // Перевіряємо, чи є рядки для читання
                     if (reader.HasRows)
                     {
-                        // Read advances to the next row.
+                        // Читаємо усі рядки
                         while (reader.Read())
                         {
-                            // To avoid unexpected bugs access columns by name.
-                            //p.ID = reader.GetInt32(reader.GetOrdinal(columnName));
-
+                            // Шукаємо стовбець за ім'ям
                             int idColumnIndex = reader.GetOrdinal(tableName + "_id");
-                            // If a column is nullable always check for DBNull...
+                            // Перевіряємо, чи стовбець не пустий
                             if (!reader.IsDBNull(idColumnIndex))
                             {
-                            //    p.MiddleName = reader.GetString(middleNameIndex);
                                 int id = reader.GetInt32(idColumnIndex);
                                 result = id.ToString();
                             }
-                            //p.LastName = reader.GetString(reader.GetOrdinal("LastName"));
                         }
 
                     }
@@ -534,12 +403,9 @@ namespace MusicDataBase
         {
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-      //          dataGridView1.Rows[e.RowIndex].Selected = true;
-
                 if (dataGridView1.Columns["Play"] != null && e.ColumnIndex == dataGridView1.Columns["Play"].Index)
                 {
                     if (dataGridView1.Columns.Contains("track_path"))
-                    //if (dataGridView1.Columns[e.ColumnIndex].HeaderText == "track_path")
                     {
 
                         String trackPath = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_path"].Index].FormattedValue.ToString();
@@ -560,21 +426,16 @@ namespace MusicDataBase
                             playingTrackName += trackName;
                         }
 
-                        System.Console.WriteLine("PLAY!");
-                        //if (axWindowsMediaPlayer1.URL.Equals(trackPath))
                         if (wmp.URL.Equals(trackPath))
                         {
-                            //if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
                             if (wmp.playState == WMPLib.WMPPlayState.wmppsPlaying)
                             {
-                                //axWindowsMediaPlayer1.Ctlcontrols.pause();
                                 wmp.controls.pause();
                                 playerLabel.Text = "Paused";
                                 playerPauseButton.Text = "Play";
                             }
                             else
                             {
-                                //axWindowsMediaPlayer1.Ctlcontrols.play();
                                 wmp.controls.play();
                                 playerLabel.Text = "Playing";
                                 playerPauseButton.Text = "Pause";
@@ -582,7 +443,6 @@ namespace MusicDataBase
                         }
                         else
                         {
-                            //axWindowsMediaPlayer1.URL = trackPath;
                             wmp.URL = trackPath;
                             initPlayer();
                             playingTrackName = "    " + playingTrackName + "    ";
@@ -598,14 +458,12 @@ namespace MusicDataBase
         {
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-    //            dataGridView1.Rows[e.RowIndex].Selected = true;
                 String value = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].FormattedValue.ToString().Replace("'", "''");
                 String column = dataGridView1.Columns[e.ColumnIndex].HeaderText;
                 DataGridCell cell = new DataGridCell(e.RowIndex, e.ColumnIndex);
                 selectedCells.Add(cell);
                 System.Console.WriteLine(value);
                 System.Console.WriteLine(column);
-
 
                 String request = "";
 
@@ -678,27 +536,12 @@ namespace MusicDataBase
 
                     case "track_path":
                         {
-                            //System.Diagnostics.Process.Start("explorer.exe", "/select, \"" + value +"\"");
                             System.Diagnostics.Process.Start("explorer.exe", string.Format("/select,\"{0}\"", value));
                             break;
                         }
                 }
 
-
                 fillDataGrid(request);
-
-
-                //if (dataGridView1.Columns.Contains("track_path"))
-                //if (e.ColumnIndex == dataGridView1.Columns["Play"].Index)
-                //{
-                    //if (dataGridView1.Columns.Contains("track_path"))
-                    //if (dataGridView1.Columns[e.ColumnIndex].HeaderText == "track_path")
-                   // {
-                    //    System.Console.WriteLine("PLAY!");
-                        // dataGridView1.Columns.C
-                     //   axWindowsMediaPlayer1.URL = dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.Columns["track_path"].Index].FormattedValue.ToString();
-                   // }
-                //}
             }
         }
 
@@ -737,9 +580,7 @@ namespace MusicDataBase
                     this.dataGridView1.DataSource = dataTable;
                     if (tables.Count == 1) backButton.Enabled = true;
                     tables.Add(dataTable);
-                    //this.comboBox1.DataSource = dataTable;
-                    //this.comboBox1.ValueMember = dataTable.Columns[0].ColumnName;
-                    //this.comboBox1.DisplayMember = dataTable.Columns[1].ColumnName;
+
                     columnsComboBox.Items.Clear();
                     foreach (DataColumn column in dataTable.Columns)
                     {
@@ -770,7 +611,6 @@ namespace MusicDataBase
                 }
             }
         }
-
 
         WindowsMediaPlayer wmp = new WindowsMediaPlayer();
 
@@ -859,19 +699,7 @@ namespace MusicDataBase
                 m = (s - (h * 3600)) / 60;
                 s = s - (h * 3600 + m * 60);
                 playerPlaytime.Text = String.Format("{0:D}:{1:D2}:{2:D2}", h, m, s);
-                ///
-                /*
-                iScroll = iScroll + 1;
-                int iLmt = playingTrackName.Length - iScroll;
-                if (iLmt < 30)
-                {
-                    iScroll = 0;
-                }
-
-                string str = playingTrackName.Substring(iScroll, 30);
-                playerTrackName.Text = str;
-                */
-                //
+                
                 iScroll+=2;
                 if (iScroll >= playingTrackName.Length) iScroll = 0;
                 string str = playingTrackName.Substring(iScroll) + playingTrackName.Remove(iScroll); ;
@@ -971,12 +799,12 @@ namespace MusicDataBase
 
         private void backButton_Click(object sender, EventArgs e)
         {
-            if (tables.Count > 1) //2 and more
+            if (tables.Count > 1) //2 таблиці, або більше
             {
                 try
                 {
-                    tables.RemoveAt(tables.Count - 1); //remove current table (it is showing on screen)
-                    DataTable dataTable = tables[tables.Count - 1]; //get previous table
+                    tables.RemoveAt(tables.Count - 1); //прибираємо поточну табоицю (та що зараз на екрані)
+                    DataTable dataTable = tables[tables.Count - 1]; //показуємо попередню таблицю
                     dataGridView1.Columns.Clear();
                     this.dataGridView1.DataSource = dataTable;
 
