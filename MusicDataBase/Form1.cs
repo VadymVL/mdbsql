@@ -87,22 +87,22 @@ namespace MusicDataBase
                         if (TagLib.MediaTypes.Audio == tagFile.Properties.MediaTypes) //Якщо цей медіа-файл є аудіо-файлом
                         {
                             if (tagFile.Tag.IsEmpty == false) //Якщо у ньому є теги
-                            {
+                            {   //Зчитуємо усі теги
                                 String artist_name = toUtf8(tagFile.Tag.FirstPerformer);
                                 String album_name = toUtf8(tagFile.Tag.Album);
                                 String genre_name = toUtf8(tagFile.Tag.FirstGenre);
                                 String track_year = toUtf8(tagFile.Tag.Year.ToString());
                                 String track_name = toUtf8(tagFile.Tag.Title);
                                 String track_path = toUtf8(tagFile.Name);
-                                
+                                //Якщо немає елементарних даних (виконавець - назва пісні) - переходимо до іншого
                                 if (String.IsNullOrEmpty(artist_name) || String.IsNullOrWhiteSpace(artist_name)) continue;
                                 if (String.IsNullOrEmpty(track_name) || String.IsNullOrWhiteSpace(track_name)) continue;
-
+                                //Додаємо у базу інформацію про виконавця
                                 String[] artist_columns = {"artist_name"};
                                 String[] artist_values = { artist_name };
                                 dbInsert("artist", artist_columns, artist_values, connection);
                                 String artistId = dbGetID("artist", "artist_name", artist_name, connection);
-
+                                //Якщо є інформація про жанр - додаємо до бази
                                 String genreId = "";
                                 if (!String.IsNullOrEmpty(genre_name) || !String.IsNullOrWhiteSpace(genre_name))
                                 {
@@ -111,7 +111,7 @@ namespace MusicDataBase
                                     dbInsert("genre", genre_columns, genre_values, connection);
                                     genreId = dbGetID("genre", "genre_name", genre_name, connection);
                                 }
-
+                                //Якщо є інформація про альбом - додаємо до бази
                                 String albumId = "";
                                 if (!String.IsNullOrEmpty(album_name) || !String.IsNullOrWhiteSpace(album_name))
                                 {
@@ -144,7 +144,7 @@ namespace MusicDataBase
                     }
                     
                 }
-
+                //Якщо ввімкнено опцію показу стану сканування - виводимо інформацію
                 if (showProcessCheckBox.Checked == true)
                 {
                     String[] result = new String[4];
@@ -156,7 +156,7 @@ namespace MusicDataBase
                 }
 			}
             totalFolders++;
-            transaction.Commit();
+            transaction.Commit(); //Підтверджуємо транзакцію додавання до бази
 		}
 
         public string toUtf8(string unknown) //Конвертуємо усі теги у UTF-8
@@ -194,7 +194,7 @@ namespace MusicDataBase
                 bw.RunWorkerAsync();
             }
         }
-
+        //Виконуємо операції у окремому потоці, для того, щоб не навантажувати основний потік, що оновлює інтерфейс користувача
         private void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -207,9 +207,9 @@ namespace MusicDataBase
                 {
                     a = DateTime.Now;
                     DirectoryInfo folder = new DirectoryInfo(folderName);
-                    initDbConnection();
+                    initDbConnection(); //Ініціалізуємо зв'зок з базою
                     connection.Open();
-                    if (subdirectCheckBox.Checked) //subdirectories
+                    if (subdirectCheckBox.Checked) //Сканування підкаталогів
                     {
                         ParseAudio(folder);
                         FilesInSubDirectories(folderName);
@@ -294,7 +294,7 @@ namespace MusicDataBase
                 connection.Close();
             }
         }
-
+        //Метод додавання у базу інформації
         private void dbInsert(String tableName, String[] columnsArray, String[] valuesArray, SQLiteConnection connection)
         {
             String conditionString = "";

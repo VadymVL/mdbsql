@@ -16,4 +16,3 @@ C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase
 C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.csproj.GenerateResource.Cache
 C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.exe
 C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.pdb
-C:\Users\Vadym\Documents\Visual Studio 2012\Projects\MusicDataBase\MusicDataBase\obj\Release\MusicDataBase.csprojResolveAssemblyReference.cache
